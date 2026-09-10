@@ -1,0 +1,1222 @@
+<title>Солнечная крыша</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F4F1; --surface:#FDFDFC; --ink:#20272C; --muted:#5D6C76; --line:#D6DDE1;
+  --accent:#E8930C; --accent-soft:#FCEBD2; --accent-ink:#9A5F03;
+  --roof:#E7EBE7; --grid:#D3DAD6; --walk:#C9D2CC;
+  --panel-se:#26364F; --panel-se-line:#4A5F82; --panel-nw:#45525F; --panel-nw-line:#6B7A88;
+  --danger:#C9412F; --ok:#2E7D4F; --ghost:#9AA7AE;
+  --chip:#E9EDEA;
+}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14181C; --surface:#1B2126; --ink:#E7ECEF; --muted:#95A3AC; --line:#303A41;
+    --accent:#F2A331; --accent-soft:#3A2C13; --accent-ink:#F2A331;
+    --roof:#222A30; --grid:#2E383F; --walk:#39444C;
+    --panel-se:#2C3F5E; --panel-se-line:#5C77A3; --panel-nw:#3E4C59; --panel-nw-line:#75858F;
+    --danger:#E0654F; --ok:#57A87B; --ghost:#5C6B75;
+    --chip:#242C33;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14181C; --surface:#1B2126; --ink:#E7ECEF; --muted:#95A3AC; --line:#303A41;
+  --accent:#F2A331; --accent-soft:#3A2C13; --accent-ink:#F2A331;
+  --roof:#222A30; --grid:#2E383F; --walk:#39444C;
+  --panel-se:#2C3F5E; --panel-se-line:#5C77A3; --panel-nw:#3E4C59; --panel-nw-line:#75858F;
+  --danger:#E0654F; --ok:#57A87B; --ghost:#5C6B75;
+  --chip:#242C33;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif}
+.wrap{max-width:1160px;margin:0 auto;padding:32px 20px 80px}
+header .eyebrow{font:500 12px/1 "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+h1{font:700 clamp(28px,4.5vw,44px)/1.1 "Archivo",sans-serif;margin:.35em 0 .3em;text-wrap:balance}
+h2{font:600 22px/1.25 "Archivo",sans-serif;margin:2.2em 0 .6em;text-wrap:balance}
+h3{font:600 17px/1.3 "Archivo",sans-serif;margin:1.4em 0 .4em}
+.lede{color:var(--muted);max-width:62ch;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chip{background:var(--chip);border:1px solid var(--line);border-radius:6px;padding:5px 12px;font:500 13px/1.4 "IBM Plex Mono",monospace}
+.chip b{color:var(--accent-ink)}
+
+.planner{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-top:28px;overflow:hidden}
+.pbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.tabs{display:flex;flex-direction:column;gap:8px;width:100%}
+.tgroup{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tglabel{flex:0 0 118px;font:600 10.5px/1.3 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tab{font:600 14px/1 "Archivo",sans-serif;padding:10px 14px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:7px;cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#1C1204}
+.stats{display:flex;gap:16px;margin-left:auto;font:500 13px/1.3 "IBM Plex Mono",monospace;flex-wrap:wrap}
+.stats span b{font-size:16px}
+#stConf.bad{color:var(--danger)}
+#stConf.good{color:var(--ok)}
+.toolbar{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.toolbar button{font:500 13px/1 "IBM Plex Sans",sans-serif;padding:8px 12px;border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:6px;cursor:pointer}
+.toolbar button:hover{border-color:var(--accent)}
+.toolbar button.active{background:var(--accent);border-color:var(--accent);color:#1C1204}
+svg.measuring{cursor:crosshair}
+.mline{stroke:var(--danger);stroke-width:2.5;stroke-dasharray:8 5}
+.mdot{fill:var(--danger)}
+.mtext{fill:var(--danger);font:600 22px "IBM Plex Mono",monospace;paint-order:stroke;stroke:var(--surface);stroke-width:5;stroke-linejoin:round}
+.toolbar .hint{margin-left:auto;color:var(--muted);font-size:12.5px;align-self:center}
+button:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.svgbox{overflow-x:auto;background:var(--surface)}
+svg{display:block;min-width:720px;width:100%;height:auto;touch-action:none}
+.svgnote{padding:10px 16px 16px;color:var(--muted);font-size:13.5px;border-top:1px solid var(--line)}
+
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px 22px;margin-top:16px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-size:14px}
+.lg{display:flex;align-items:center;gap:10px}
+.sw{flex:0 0 30px;height:18px;border-radius:3px}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 22px}
+.card h3{margin-top:0}
+.card .big{font:700 30px/1 "Archivo",sans-serif}
+.card .big small{font:500 14px "IBM Plex Mono",monospace;color:var(--muted)}
+.tag{display:inline-block;font:600 11px/1 "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;padding:4px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent-ink);margin-bottom:10px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+.tablebox{overflow-x:auto}
+th,td{text-align:left;padding:7px 12px;border-bottom:1px solid var(--line)}
+th{font:600 12px/1.4 "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.mono,th.mono{font-family:"IBM Plex Mono",monospace}
+ul{padding-left:20px}
+li{margin:6px 0}
+p{max-width:70ch}
+.note{border-left:3px solid var(--accent);background:var(--surface);border-radius:0 8px 8px 0;padding:12px 16px;color:var(--muted);font-size:14.5px;margin:14px 0}
+footer{margin-top:48px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+a{color:var(--accent-ink)}
+h2,h3,.planner{scroll-margin-top:14px}
+.toc{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:14px;font:500 13px/1.6 "IBM Plex Mono",monospace}
+.toc a{text-decoration:none;border-bottom:1px dotted var(--line)}
+.toc a:hover{border-bottom-color:var(--accent)}
+kbd{font:500 12px "IBM Plex Mono",monospace;background:var(--chip);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 6px}
+
+/* SVG element styles */
+.roofsurf{fill:var(--roof);stroke:var(--ink);stroke-width:2.5}
+.gridline{stroke:var(--grid);stroke-width:1}
+.walkband{fill:var(--walk);opacity:.5}
+.dim line,.dim path{stroke:var(--muted);stroke-width:1.2}
+.dim text{fill:var(--muted);font:500 19px "IBM Plex Mono",monospace}
+.lbl{fill:var(--muted);font:500 18px "IBM Plex Sans",sans-serif}
+.lbl-strong{fill:var(--ink);font:600 20px "Archivo",sans-serif;letter-spacing:.06em}
+.panel rect.body{stroke-width:1.6;cursor:grab}
+.panel.se rect.body{fill:var(--panel-se);stroke:var(--panel-se-line)}
+.panel.nw rect.body{fill:var(--panel-nw);stroke:var(--panel-nw-line)}
+.panel line.cell{stroke:var(--panel-se-line);stroke-width:.8;opacity:.5;pointer-events:none}
+.panel.nw line.cell{stroke:var(--panel-nw-line)}
+.panel rect.lowedge{fill:var(--accent);pointer-events:none}
+.panel text{fill:#E9EDF3;font:500 17px "IBM Plex Mono",monospace;pointer-events:none}
+.panel.selected rect.body{stroke:var(--accent);stroke-width:4}
+.panel.bad rect.body{stroke:var(--danger);stroke-width:4}
+.obst circle.pipe{fill:var(--surface);stroke:var(--ink);stroke-width:2;cursor:grab}
+.obst.bad circle.pipe,.obst.bad rect.block{stroke:var(--danger)!important;stroke-width:3}
+.obst rect.block{fill:var(--chip);stroke:var(--ink);stroke-width:2;cursor:grab}
+.obst rect.dashedblock{fill:var(--chip);stroke:var(--muted);stroke-width:2;stroke-dasharray:7 5;cursor:grab}
+.obst text{fill:var(--muted);font:500 15px "IBM Plex Mono",monospace;pointer-events:none}
+.ghost{fill:none;stroke:var(--ghost);stroke-width:1.6;stroke-dasharray:5 5}
+.movearrow{stroke:var(--accent);stroke-width:2;fill:none;marker-end:url(#arrhead)}
+.compass text{fill:var(--ink);font:600 20px "Archivo",sans-serif}
+.compass .ring{fill:none;stroke:var(--muted);stroke-width:1.5}
+.compass .np{fill:var(--danger)}
+.compass .sp{fill:var(--muted)}
+.sun{fill:var(--accent)}
+.sunpath{stroke:var(--accent);stroke-width:2;stroke-dasharray:2 7;fill:none;opacity:.9}
+/* single-line electrical scheme */
+.sch{display:block;width:100%;height:auto;min-width:640px}
+.sch .box{fill:var(--chip);stroke:var(--ink);stroke-width:1.6}
+.sch .boxd{fill:none;stroke:var(--muted);stroke-width:1.6;stroke-dasharray:7 5}
+.sch text{fill:var(--ink);font:500 17px "IBM Plex Sans",sans-serif}
+.sch text.small{fill:var(--muted);font:400 14px "IBM Plex Mono",monospace}
+.sch .wdc{stroke:var(--accent);stroke-width:2.5;fill:none}
+.sch .wac{stroke:var(--ink);stroke-width:2.5;fill:none}
+.sch .wbat{stroke:var(--ok);stroke-width:2.5;fill:none}
+.sch .wcan{stroke:var(--muted);stroke-width:2;stroke-dasharray:4 5}
+.sch .iso{fill:var(--surface);stroke:var(--ink);stroke-width:1.5}
+td.pos{color:var(--ok);font-weight:600}
+td.neg{color:var(--danger);font-weight:600}
+@media (prefers-reduced-motion: no-preference){
+  .panel{transition:opacity .15s}
+}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Частный дом</div>
+  <h1>Солнечная крыша</h1>
+  <p class="lede">Схема размещения 20 панелей TOPCon Bifacial Dual Glass 580 Вт на твоей половине плоской крыши (сторона к улице). Панели и трубы на плане можно двигать мышью — позиции труб взяты с эскиза схематично, подгони их по реальным замерам.</p>
+  <div class="chips">
+    <span class="chip">20 × 580 Вт = <b>11,6 кВт</b></span>
+    <span class="chip">панель <b>2278 × 1134 × 30 мм</b>, ~32 кг</span>
+    <span class="chip">крыша <b>10,2 × 7,5 м</b>, плоская</span>
+    <span class="chip">опоры <b>10°</b>, рама к парапету</span>
+    <span class="chip">азимут ската <b>~140° (ЮВ)</b></span>
+    <span class="chip">2 × Deye <b>SUN-6K-SG05LP1</b> (1ф, 2 MPPT)</span>
+    <span class="chip">АКБ 2 × 15,36 = <b>30,7 кВт·ч</b> LiFePO4</span>
+  </div>
+  <nav class="toc">
+    <a href="#planner">план</a><a href="#rating">рейтинг</a><a href="#variants">варианты</a><a href="#qa">вопросы</a><a href="#tilt">наклон</a><a href="#marks">отметки</a><a href="#frame">конструкция</a><a href="#electro">электрика</a><a href="#grid">сеть</a><a href="#monthly">баланс</a><a href="#membrane">мембрана</a><a href="#checklist">чек-лист</a><a href="#assumptions">допущения</a>
+  </nav>
+</header>
+
+<div class="planner" id="planner">
+  <div class="pbar">
+    <div class="tabs" role="tablist">
+      <div class="tgroup"><span class="tglabel">рабочие · прямые ряды</span>
+        <button class="tab" data-v="P" aria-pressed="false">P · целевой план ★★</button>
+        <button class="tab" data-v="A" aria-pressed="true">A · 20 домиком</button>
+        <button class="tab" data-v="B" aria-pressed="false">B · 14 базовый</button>
+        <button class="tab" data-v="C" aria-pressed="false">C · 20 ЮВ + сосед</button>
+        <button class="tab" data-v="G" aria-pressed="false">G · зимний ★</button>
+        <button class="tab" data-v="G1" aria-pressed="false">G1 · 20 без соседа ★</button>
+        <button class="tab" data-v="G2" aria-pressed="false">G2 · два ряда 35°</button>
+        <button class="tab" data-v="G3" aria-pressed="false">G3 · 35°+35°лёжа+2×10°</button>
+        <button class="tab" data-v="E" aria-pressed="false">E · 35° стоя</button>
+        <button class="tab" data-v="I" aria-pressed="false">I · 35° лёжа</button>
+      </div>
+      <div class="tgroup"><span class="tglabel">повороты на юг</span>
+        <button class="tab" data-v="D" aria-pressed="false">D · 20 юг</button>
+        <button class="tab" data-v="D1" aria-pressed="false">D1 · юг + угол</button>
+        <button class="tab" data-v="N" aria-pressed="false">N · G + юг низ</button>
+        <button class="tab" data-v="N1" aria-pressed="false">N1 · 7 + 13 юг</button>
+        <button class="tab" data-v="N2" aria-pressed="false">N2 · твоя, с зазорами</button>
+        <button class="tab" data-v="H" aria-pressed="false">H · 35° стоя юг</button>
+        <button class="tab" data-v="J" aria-pressed="false">J · 35° лёжа юг</button>
+      </div>
+      <div class="tgroup"><span class="tglabel">вся крыша · фантазия</span>
+        <button class="tab" data-v="F" aria-pressed="false">F · максимум 35°</button>
+        <button class="tab" data-v="K" aria-pressed="false">K · юг 35°</button>
+        <button class="tab" data-v="L" aria-pressed="false">L · юг 2×8</button>
+        <button class="tab" data-v="M" aria-pressed="false">M · юг 2×7</button>
+      </div>
+    </div>
+    <div class="stats">
+      <span>панелей <b id="stN">20</b></span>
+      <span>мощность <b id="stKw">11,6</b> кВт</span>
+      <span>конфликтов <b id="stConfB"><span id="stConf">0</span></b></span>
+      <span>выработка <b id="stE">≈12,4</b> МВт·ч/год</span>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button id="btnAdd">+ Панель</button>
+    <button id="btnRot">Повернуть <kbd>R</kbd></button>
+    <button id="btnDel">Удалить <kbd>Del</kbd></button>
+    <button id="btnMeasure">📏 Рулетка</button>
+    <button id="btnReset">Сбросить вариант</button>
+    <span class="hint">клик — выбрать · <b>shift+клик — выделить несколько</b>, тянуть можно всей группой · стрелки — сдвиг 5 см · рулетка: включи и протяни по плану, <kbd>Esc</kbd> — сброс · выработка пересчитывается сама</span>
+  </div>
+  <div class="svgbox">
+  <svg id="plan" viewBox="-115 -150 1300 1185" role="img" aria-label="План крыши с раскладкой солнечных панелей">
+    <defs>
+      <marker id="arrhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="var(--accent)"/>
+      </marker>
+    </defs>
+    <g id="static"></g>
+    <g id="walks"></g>
+    <g id="obstLayer"></g>
+    <g id="panelLayer"></g>
+    <g id="topLayer"></g>
+    <g id="measureLayer"></g>
+  </svg>
+  </div>
+  <div class="svgnote" id="variantNote"></div>
+</div>
+
+<div class="legend">
+  <div class="lg"><span class="sw" style="background:var(--panel-se);border-bottom:4px solid var(--accent)"></span>панель, наклон 10° на юго-восток (оранжевая кромка — нижний край)</div>
+  <div class="lg"><span class="sw" style="background:var(--panel-nw);border-top:4px solid var(--accent)"></span>панель, наклон 10° на северо-запад (только вариант A)</div>
+  <div class="lg"><span class="sw" style="background:var(--surface);border:2px solid var(--ink);border-radius:50%;width:18px;flex-basis:18px"></span>труба / вент. стояк (позиция с эскиза, двигается)</div>
+  <div class="lg"><span class="sw" style="background:var(--chip);border:2px dashed var(--muted)"></span>кондиционеры у левого (ЮЗ) парапета — позиции уточнить</div>
+  <div class="lg"><span class="sw" style="background:var(--walk);opacity:.6"></span>сервисный проход ≥ 45 см</div>
+  <div class="lg"><span class="sw" style="border:2px dashed var(--ghost);background:transparent"></span>серый пунктир → оранжевая стрелка: стояк, который нужно сместить</div>
+  <div class="lg"><span class="sw" style="background:var(--walk);opacity:.25;border:1.5px dashed var(--muted)"></span>полоса крыши соседа (~1,5 м) — используется в вариантах C и E по договорённости</div>
+</div>
+
+<h2 id="rating">Итоговый рейтинг — от самого простого к самому сложному</h2>
+<p>«Удобство» = сколько согласований и работ нужно до монтажа. Жирным — три рабочих сценария; остальное — проверенные и закрытые тупики.</p>
+<div class="card"><div class="tablebox"><table>
+<tr><th>#</th><th>Вариант</th><th class="mono">Шт</th><th class="mono">Генерация</th><th class="mono">Полезно*</th><th>Что нужно сделать</th><th>Вердикт</th></tr>
+<tr><td>1</td><td><b>B · 14 без переделок</b></td><td class="mono">14</td><td class="mono">9,3</td><td class="mono">8,2</td><td>ничего: ни труб, ни соседа</td><td>стартовый — можно начать и докладывать ряды</td></tr>
+<tr><td>2</td><td>I · 12 «лёжа» 35°</td><td class="mono">12</td><td class="mono">8,7</td><td class="mono">8,0</td><td>ничего, но рама под 35°</td><td>минимум работ, зато 8 панелей в гараже</td></tr>
+<tr><td>3</td><td>A · 20 домиком</td><td class="mono">20</td><td class="mono">12,4</td><td class="mono">9,0</td><td>перенос 5 стояков</td><td>все 20 на своей половине, без крутых рам</td></tr>
+<tr><td>4</td><td><b>P · целевой план ★★</b></td><td class="mono">20</td><td class="mono">14,0</td><td class="mono">~10,1</td><td>вылет 45 см на парапет + перенос 6 стояков; без соседа!</td><td><b>победитель: энергия G3 на своей половине</b></td></tr>
+<tr><td>5</td><td><b>G1 · 20 без соседа ★</b></td><td class="mono">20</td><td class="mono">13,3</td><td class="mono">~9,9</td><td>перенос 6 стояков; ряд 35° у улицы + домик внизу</td><td>запасной без вылета и без соседа</td></tr>
+<tr><td>6</td><td><b>C · 20 на ЮВ + сосед</b></td><td class="mono">20</td><td class="mono">13,3</td><td class="mono">9,4</td><td>5 стояков + сосед 1,1 м</td><td><b>лучший при net billing</b> (4 строки по 5)</td></tr>
+<tr><td>7</td><td><b>G · «зимний» ★</b></td><td class="mono">20</td><td class="mono">13,8</td><td class="mono">10,0</td><td>4 стояка + сосед 1,1 м + задний ряд 1,3 м</td><td>сильный баланс при zero-export</td></tr>
+<tr><td>8</td><td>G3 · лесенка 35°/35°лёжа/10°/10°</td><td class="mono">20</td><td class="mono">14,0</td><td class="mono">~10,1</td><td>4 стояка + сосед 0,7 м + одна высокая рама</td><td>P без вылета — если вылет запретят</td></tr>
+<tr><td>9</td><td>G2 · два ряда 35°</td><td class="mono">20</td><td class="mono">14,3</td><td class="mono">~10,3</td><td>4 стояка + сосед 2,2 м + две высокие рамы</td><td>максимум генерации из реализуемых</td></tr>
+<tr><td>10</td><td>E · F — крутые без поворота</td><td class="mono">14–20</td><td class="mono">10,2–14,5</td><td class="mono">9,0–10,5</td><td>высокие рамы; F — вся крыша</td><td>E проигрывает G; F — ориентир-фантазия</td></tr>
+<tr><td>11</td><td>D · D1 · N · N1 · N2 · H · J · K · L · M — повороты на юг</td><td class="mono">10–20</td><td class="mono">7,5–14,0</td><td class="mono">≤10,1</td><td>диагональная рама, глубокий заход, стояки под рядами</td><td>закрыто: углы дороже азимута (см. вопрос о раме ниже)</td></tr>
+</table></div></div>
+<p style="color:var(--muted);font-size:14px">* полезная энергия при zero-export (запрете выдачи в сеть), МВт·ч/год. Логика выбора: запускаешься по B → договариваешься с соседом и сантехником → доращиваешь до G (при запрете выдачи) или C (при net billing). Раскладки B и C совместимы по рядам, G отличается только задним рядом.</p>
+
+<h2 id="variants">Как это устроено</h2>
+<div class="grid2">
+  <div class="card">
+    <span class="tag">Вариант A · рекомендую</span>
+    <div class="big">20 шт <small>= 11,6 кВт · ≈12,4 МВт·ч/год</small></div>
+    <p>Компоновка «домиком» (восток–запад типа): пары рядов наклонены навстречу — 12 панелей на юго-восток, 8 на северо-запад. Так ряды не затеняют друг друга и вся партия помещается.</p>
+    <p><b>Условие:</b> 5 малых стояков (подсвечены стрелками) смещаются на 0,3–0,6 м в сервисные проходы — для фановых канализационных труб это штатная операция (колено + вывод в проходе).</p>
+  </div>
+  <div class="card">
+    <span class="tag">Вариант B · ничего не переносим</span>
+    <div class="big">14 шт <small>= 8,1 кВт · ≈9,3 МВт·ч/год</small></div>
+    <p>Все ряды наклонены на юго-восток, трубы остаются на местах — панели их обходят. Выработка на панель выше (~15%), но 6 панелей из купленных 20 остаются без места.</p>
+    <p>Если реальные позиции труб окажутся удачнее эскизных, в этом варианте помещается до 16 — двигай панели на плане и смотри на счётчик конфликтов.</p>
+  </div>
+</div>
+
+<h2 id="more">Ещё варианты — сосед, поворот на юг, «стоя», вся крыша</h2>
+<div class="grid2">
+  <div class="card">
+    <span class="tag">Вариант C · лучший, если сосед согласен</span>
+    <div class="big">20 шт <small>= 11,6 кВт · ≈13,3 МВт·ч/год</small></div>
+    <p>Все 20 панелей на юго-восток 10°, пятый ряд заходит на крышу соседа на <b>~1,1 м</b> (полоса вдоль границы). Это +7% к варианту A: исчезают 8 «северо-западных» панелей.</p>
+    <p>Бонус для электрики: все панели одной ориентации → 4 строки по 5, идеально симметрично по обоим Deye. Условия: согласие соседа, проверить <b>его</b> трубы в этой полосе, сместить те же 5 стояков.</p>
+  </div>
+  <div class="card">
+    <span class="tag">Вариант D · 20 на юг 10° — красиво, но дорого</span>
+    <div class="big">20 шт <small>= 11,6 кВт · ≈13,7 МВт·ч/год</small></div>
+    <p>Все 20 под 10° строго на юг диагональными рядами. Энергия — уровень G. Но цена: чтобы вместить 20, нужен заход на соседа <b>до ~3 м</b> (при полосе 1,5 м влезает лишь 17), 3–4 стояка под рядами, и вся рама — диагональная, каждый ряд своей длины.</p>
+    <p>Арифметика против: юг вместо ЮВ при 10° даёт лишь +3–4% на панель — G получает те же кВт·ч заходом 1,1 м и прямыми рядами вдоль парапета. D — вариант «для красоты», если сосед согласен на много.</p>
+  </div>
+  <div class="card">
+    <span class="tag">Вариант E · «стоя» под 35° — не стоит</span>
+    <div class="big">14 шт <small>= 8,1 кВт · ≈10,2 МВт·ч/год</small></div>
+    <p>Панели портретом («стоя») под оптимальные 35°: с каждой панели +8–10%, но задняя кромка поднимается на 1,3 м и против зимней тени между рядами нужно <b>3,8 м</b>. Итог — всего 2 ряда, 14 шт, и второй ряд всё равно лезет к соседу на 0,8 м.</p>
+    <p>Плюс парусность: анкеровка и рама заметно тяжелее. Крутой наклон выигрывает только там, где площадь не ограничена.</p>
+  </div>
+  <div class="card">
+    <span class="tag">Вариант F · теоретический максимум</span>
+    <div class="big">20 шт <small>= 11,6 кВт · ≈14,5 МВт·ч/год</small></div>
+    <p>Если вся крыша дома (10,2 × 15 м) наша и пустая — правило меняется: площади много, и выигрывает <b>крутой наклон</b>. 20 панелей портретом под 35° на ЮВ, 3 ряда (8+8+4) с межрядьем 3,6 м: +9% к варианту C, +17% к A.</p>
+    <p>Поворот строго на юг добавил бы ещё ~3% — на просторе можно, но рама сложнее. Это ориентир «сколько вообще можно выжать из 20 панелей» и план на случай, если договоришься с соседом на всю крышу.</p>
+  </div>
+  <div class="card">
+    <span class="tag">Вариант G · «зимний» ★ рекомендую при zero-export</span>
+    <div class="big">20 шт <small>= 11,6 кВт · ≈13,8 МВт·ч/год · полезно ≈10,0</small></div>
+    <p>Хитрость: высокий ряд ставится <b>у улицы (СЗ край)</b> — тень от него падает на улицу, а не на поле. 8 панелей «стоя» под 35° сзади + 12 панелей под 10° ЮВ впереди: почти вся зимняя прибавка варианта F, но на своей крыше (заход нижнего ряда ~1,1 м, как в C).</p>
+    <p>Бонусы: переносим только 4 канализационных стояка (вент. ⌀30 остаются), а строки — как в варианте A: 8 шт на один MPPT (449 В) + 2×6. При запрете выдачи в сеть это лучший баланс из реализуемых.</p>
+  </div>
+  <div class="card">
+    <span class="tag">Варианты H · I · J — 35° лёжа и повороты</span>
+    <p><b>I · 35° «лёжа»</b> (12 шт, ≈8,7 / полезно ≈8,0): единственный осмысленный из трёх — кромка всего 0,65 м, межрядье 1,8 м, ноль переносов труб и почти без соседа. Это «вариант-минимум работ», энергия на уровне B.</p>
+    <p><b>H · 35° стоя + юг</b> (~11 шт, ≈8,0) и <b>J · 35° лёжа + юг</b> (~10 шт, ≈7,5): поворот на юг + крутой наклон = двойная потеря площади (углы + межрядья). Закрывают вопрос про повороты: на этой крыше ряды всегда вдоль парапета.</p>
+  </div>
+</div>
+
+<h2 id="qa">Быстрые ответы: домик 35°, G домиком, подсобка, вылет, рама</h2>
+<div class="grid2">
+  <div class="card">
+    <span class="tag">Домик под 35° · нет</span>
+    <p>«Домик» — это всегда пара «лицом врозь»: одна половина смотрит на ЮВ, вторая на СЗ. При 10° северо-западная половина теряет ~17% — терпимо, за это домик и любят. При 35° СЗ-панель задирается в северное небо и даёт ~700 кВт·ч/кВт против 950 при 10° — минус 40% на половине поля.</p>
+    <p>Правило: <b>домик — инструмент малых углов (5–15°)</b>. Крутые углы — только одиночными рядами на юг/ЮВ. Поэтому и G домиком делать не нужно: в G всё и так помещается одиночной ЮВ-ориентацией, а домик добавил бы только потери.</p>
+  </div>
+  <div class="card">
+    <span class="tag">Подсобка на газоне (ЮЗ угол) · только как +2 сверх 20</span>
+    <p>2 панели = 1,16 кВт → на крыше подсобки под 15–20° на Ю/ЮЗ это <b>~1,0–1,1 МВт·ч/год</b> — не мизер (≈8% системы), и вечерний ЮЗ-профиль хорош для самопотребления. Но два нюанса:</p>
+    <p><b>1) Электрика:</b> строка из 2 панелей (~86 В) не запустит MPPT Deye — ему нужно от ~150 В, то есть минимум 4 панели. Для двух панелей правильное решение — <b>AC-микроинвертор 800–1200 Вт</b> (~$150–250) прямо в щит. <b>2) Тень:</b> дом (два этажа, ~7,5 м) стоит к востоку от газона — зимним утром его тень накрывает подсобку до ~10–11 ч, поэтому наклон только Ю/ЮЗ, не ЮВ.</p>
+    <p>Вывод: раз все 20 панелей влезают на дом (C/G), подсобка — не замена, а <b>опция №21–22 с докупкой</b>. Делать в последнюю очередь.</p>
+  </div>
+  <div class="card">
+    <span class="tag">Вылет верхнего ряда на парапет · можно, но с оговорками</span>
+    <p><b>Можно:</b> консоль до ~1/3 длины панели за линию крепления (в пределах клемп-зон производителя), а лучше вообще опереть раму на сам парапет и заанкериться в его ж/б — тогда это не консоль, а опора. Нависать над вырезом слева тоже можно, <b>если территория под ним твоя</b> — уточни.</p>
+    <p><b>Нельзя / осторожно:</b> над дымоходом — но выяснилось, что вверху справа не дымоход, а малый вент. выход (~25 см), поэтому вылетный ряд помещается целиком из 8 панелей (вариант P); за внешний контур дома нельзя (снег, капёж, юридика); и это краевая ветровая зона — подсос ×1,5–2, расчёт рамы строже.</p>
+    <p><b>Стоит ли:</b> вылет экономит ~0,6 м глубины поля, но 8-я панель на 35° даёт ~725 кВт·ч/год — она ценнее сэкономленной глубины во всех вариантах, кроме случая, когда эти 0,6 м полностью убирают заход к соседу. Мой выбор: 8 панелей в 65 см от края (как в G/G1/G2/G3), а вылет держать козырем на финальный замер. В планировщике вылет разрешён: тяни ряд до 60 см выше края — конфликт не загорится.</p>
+  </div>
+  <div class="card">
+    <span class="tag">Почему диагональная рама сложная</span>
+    <p>Пять причин, почему монтажники не любят ряды под углом к крыше:</p>
+    <p>1) <b>Каждый ряд — своей длины</b>: нет повторяющихся секций, весь раскрой металла индивидуальный, больше резки, сварки и ошибок. Прямые ряды — одинаковые заводские секции. 2) <b>Опоры не ложатся на регулярную сетку</b> — точечные нагрузки в случайных местах плиты, каждый узел считается отдельно. 3) <b>Анкеровка к парапету работает только там, где ряд к нему подходит</b> — половина диагональных рядов «висит» в поле, и для них возвращается балласт. 4) <b>Клиновидные зазоры</b> между рядами и краями — мёртвые зоны, по которым неудобно ходить и мыть. 5) <b>Ветровой расчёт нетиповой</b>: краевые зоны крыши ряды пересекают под углом.</p>
+    <p>Итог: диагональ добавляет 3–4% энергии на панель и 15–30% к цене конструкции — потому все «южные» варианты и проигрывают.</p>
+  </div>
+</div>
+
+<h2 id="tilt">«Перпендикулярно солнцу» — почему всё-таки 10°, а не 35° и не плоско</h2>
+<p>Интуиция верная: максимум с одной панели — когда она смотрит на юг под углом ~35° (для нашей широты, 47°). Но солнце ходит по небу, «перпендикулярно всегда» умеет только трекер, а на крыше решает другое: чем круче панель, тем длиннее её тень и тем дальше надо раздвигать ряды. На твоих 72 м² это выглядит так:</p>
+<div class="card"><div class="tablebox"><table>
+<tr><th>Компоновка</th><th class="mono">Влезает</th><th class="mono">кВт</th><th class="mono">МВт·ч/год</th><th>Комментарий</th></tr>
+<tr><td>35° на юг, ряды с шагом ~3,5 м</td><td class="mono">~10</td><td class="mono">5,8</td><td class="mono">≈7,5</td><td>максимум с панели, минимум с крыши; парусность, тяжёлый балласт</td></tr>
+<tr><td>35° ЮВ на всей пустой крыше — вариант F</td><td class="mono">20</td><td class="mono">11,6</td><td class="mono">≈14,5</td><td>теоретический максимум — нужна вся крыша</td></tr>
+<tr><td><b>микс: 8 × 35° у улицы + 12 × 10° — вариант G ★</b></td><td class="mono"><b>20</b></td><td class="mono"><b>11,6</b></td><td class="mono"><b>≈13,8</b></td><td>тень 35°-ряда уходит на улицу; лучший zero-export</td></tr>
+<tr><td><b>микс G1: 35° ряд + 10° ряд + домик — без соседа ★</b></td><td class="mono"><b>20</b></td><td class="mono"><b>11,6</b></td><td class="mono"><b>≈13,3</b></td><td>энергия C целиком на своей половине</td></tr>
+<tr><td>35° «лёжа» — вариант I</td><td class="mono">12</td><td class="mono">7,0</td><td class="mono">≈8,7</td><td>минимум работ: без переносов труб и почти без соседа</td></tr>
+<tr><td>35° + поворот на юг — H, J, K</td><td class="mono">10–16</td><td class="mono">6–9,3</td><td class="mono">≈7,5–12,1</td><td>поворот + крутой наклон = двойная потеря площади</td></tr>
+<tr><td><b>10° все на ЮВ + сосед 1,1 м — вариант C</b></td><td class="mono"><b>20</b></td><td class="mono"><b>11,6</b></td><td class="mono"><b>≈13,3</b></td><td>лучший съём; нужны согласие соседа и перенос стояков</td></tr>
+<tr><td><b>10° «домик» ЮВ/СЗ — вариант A</b></td><td class="mono"><b>20</b></td><td class="mono"><b>11,6</b></td><td class="mono"><b>≈12,4</b></td><td>максимум со своей половины, все панели при деле</td></tr>
+<tr><td>10° поворот рядов на юг — вариант D</td><td class="mono">20</td><td class="mono">11,6</td><td class="mono">≈13,7</td><td>20 влезают только с заходом ~3 м на соседа</td></tr>
+<tr><td>35° «стоя» портретом — вариант E</td><td class="mono">14</td><td class="mono">8,1</td><td class="mono">≈10,2</td><td>межрядье 3,8 м съедает крышу; парусность</td></tr>
+<tr><td>10° все на ЮВ — вариант B</td><td class="mono">14</td><td class="mono">8,1</td><td class="mono">≈9,3</td><td>лучший съём с панели без переделок труб</td></tr>
+<tr><td>Плоско (0–3°)</td><td class="mono">20</td><td class="mono">11,6</td><td class="mono">≈12,0</td><td>почти как вариант A, но пыль и снег не сходят — минус ещё 3–7% и мойка дважды в год</td></tr>
+</table></div></div>
+<p>Вывод: угол наклона — это торг между выработкой одной панели и количеством панелей. При ограниченной площади суммарные кВт·ч почти всегда выигрывает низкий наклон с плотной раскладкой, поэтому весь коммерческий сектор ставит на плоских крышах именно 10–15°. Совсем плоско не стоит: 10° — это минимальный угол, при котором дождь сам смывает пыль, а зимой сходит снег.</p>
+
+<h3>Ориентация и наклон — почему так</h3>
+<ul>
+  <li><b>Юг — по диагонали «вниз-влево» плана.</b> Улица идёт с ЮЗ на СВ (~50°), твоя половина примыкает к ней с северо-запада. Нижний край плана смотрит на юго-восток (~140°) — это всего ~40° от юга, потеря выработки ~3–5%. Разворачивать конструкции по диагонали ради «чистого юга» не стоит — потеряешь больше на площади.</li>
+  <li><b>Наклон 10°</b> — стандарт для плоских крыш: низкий парус на ветру, минимум балласта, дождь смывает пыль, а межрядные промежутки маленькие. При 30° влезло бы всего ~10–12 панелей.</li>
+  <li><b>Межрядные промежутки 40–60 см</b> при высоте задней кромки ~20 см: зимнее солнце в полдень ~20°, тень от ряда почти не достаёт до следующего. Панели half-cut в альбомной ориентации теряют максимум половину строки даже при задетой кромке.</li>
+  <li><b>Bifacial на плоской кровле:</b> светлая мембрана под панелями добавит 3–7% с тыльной стороны. Если мембрана тёмная (как на фото) — прибавка ~1–3%.</li>
+</ul>
+
+<h2 id="marks">Монтажные отметки</h2>
+<p>Координаты от <b>верхнего левого угла</b> крыши (угол у улицы, где выступ): X — вдоль длинной стороны (10,2 м), Y — к соседской половине. Панели в альбомной ориентации, проекция 2,28 × 1,11 м.</p>
+<div class="grid2">
+<div class="card"><h3>Вариант A</h3><div class="tablebox"><table>
+<tr><th>Ряд</th><th>Наклон</th><th class="mono">Y, м</th><th>Панели (X, м)</th></tr>
+<tr><td>1</td><td>СЗ ↑</td><td class="mono">0,75–1,86</td><td class="mono">0,55 · 2,89 · 5,23 · 7,57</td></tr>
+<tr><td>2</td><td>ЮВ ↓</td><td class="mono">1,92–3,03</td><td class="mono">0,55 · 2,89 · 5,23 · 7,57</td></tr>
+<tr><td colspan="4" class="mono" style="color:var(--muted)">проход 3,03–3,48 · сюда смещаются оба стояка ⌀30</td></tr>
+<tr><td>3</td><td>СЗ ↑</td><td class="mono">3,48–4,59</td><td class="mono">0,55 · 2,89 · 5,23 · 7,57</td></tr>
+<tr><td>4</td><td>ЮВ ↓</td><td class="mono">4,65–5,76</td><td class="mono">0,55 · 2,89 · 5,23 · 7,57</td></tr>
+<tr><td colspan="4" class="mono" style="color:var(--muted)">проход 5,76–6,31 · сюда смещается канализ. стояк, два угловых — к нижнему правому углу</td></tr>
+<tr><td>5</td><td>ЮВ ↓</td><td class="mono">6,31–7,42</td><td class="mono">0,55 · 2,89 · 5,23 · 7,57</td></tr>
+</table></div></div>
+<div class="card"><h3>Вариант B</h3><div class="tablebox"><table>
+<tr><th>Ряд</th><th>Наклон</th><th class="mono">Y, м</th><th>Панели (X, м)</th></tr>
+<tr><td>1</td><td>ЮВ ↓</td><td class="mono">0,75–1,86</td><td class="mono">0,55 · 2,89 · 5,23 · 7,57</td></tr>
+<tr><td>2</td><td>ЮВ ↓</td><td class="mono">2,45–3,56</td><td class="mono">0,55 · 2,89 · 5,23 (правый слот занят стояком)</td></tr>
+<tr><td>3</td><td>ЮВ ↓</td><td class="mono">4,10–5,21</td><td class="mono">0,55 · 2,89 · 5,23 · 7,57</td></tr>
+<tr><td>4</td><td>ЮВ ↓</td><td class="mono">5,60–6,71</td><td class="mono">0,55 · 2,89 · 6,13 (обходит стояки)</td></tr>
+</table></div></div>
+</div>
+
+<h2 id="frame">Конструкция: сварная рама к парапету и подъём панелей</h2>
+<p>План «сварить раму и закрепить к парапету» — правильный, и он же отвечает на вопрос про тень: <b>подними плоскость панелей так, чтобы нижняя кромка была вровень с верхом парапета или на 10–20 см выше.</b></p>
+<ul>
+  <li><b>Тень от парапета.</b> Да, парапет затеняет: полоса тени ≈ высота парапета над нижней кромкой панели ÷ tg(высоты солнца). Зимой при солнце 15–20° парапет 0,5 м кладёт тень на 1,5–2 м вглубь крыши — у тебя это левый (ЮЗ) край после полудня. Подъём панелей до уровня парапета убирает и её, и тень от кондиционеров.</li>
+  <li><b>Бонусы подъёма:</b> проветривание (панели холоднее на 5–15 °C → +1–2%); под панели попадает отражённый свет — <b>bifacial-тыл начинает реально работать: +5–10%</b> с твоим двойным стеклом; под рамой можно обслуживать мембрану. Суммарно подъём даёт больше, чем стоит лишний металл.</li>
+  <li><b>Не выше +0,8–1 м от кровли:</b> дальше быстро растут ветровой момент на раму и видимость конструкции с улицы. Оптимум — нижняя кромка на верхе парапета.</li>
+  <li><b>Балласт при такой схеме не нужен</b> (или минимальный на промежуточных опорах). Для сравнения, классика без анкеровки при 10°: середина крыши 10–15 кг/м², краевые зоны 20–30, углы 30–40 — итого 1,2–2 т блоков на 20 панелей. Анкеровка к парапету снимает это.</li>
+  <li><b>Нагрузка уходит в анкеры:</b> поднятая рама ловит ветер снизу, расчётный подъём в краевых зонах до ~1,5–2,5 кН на панель. Анкеры M10–M12 в парапет с шагом 1–1,5 м, рама с раскосами. <b>Критично: парапет должен быть ж/б (монолит/пояс).</b> Если он из пустотелого блока без пояса — сквозные шпильки или возврат к балласту.</li>
+  <li><b>Детали исполнения:</b> горячее цинкование или грунт+эмаль; панели крепить штатными клеммами в допустимых зонах длинной стороны (не приваривать и не сверлить рамку — слетит гарантия); промежуточные опоры на кровлю через резиновые подкладки; раму заземлить и связать с контуром дома.</li>
+  <li>Расчёт рамы на ветер (у нас ~24 м/с расчётный) стоит показать конструктору — это час работы, а держит она 640 кг стекла на высоте.</li>
+</ul>
+
+<h2 id="electro">Электрика — под твоё оборудование</h2>
+<p>Есть: <b>2 × Deye SUN-6K-SG05LP1-EU</b> (гибрид, 1 фаза, 6 кВт AC, 2 MPPT по ~13 А, PV до 7,8 кВт, MPPT 150–425 В, макс. 500 В, батарейная шина 48 В до 135 А) и <b>2 × LiFePO4 51,2 В 300 Ач</b> = 30,7 кВт·ч. Суммарно 12 кВт AC на 11,6 кВт панелей — сходится отлично.</p>
+<div class="card"><h3>Строки (вариант A — все 20)</h3><div class="tablebox"><table>
+<tr><th>Инвертор</th><th>MPPT</th><th>Строка</th><th class="mono">V размах*</th><th class="mono">кВт</th></tr>
+<tr><td rowspan="2">№1 (ЮВ, 6,96 кВт)</td><td class="mono">1</td><td>6 × ЮВ последовательно</td><td class="mono">258–337 В ✓</td><td class="mono">3,48</td></tr>
+<tr><td class="mono">2</td><td>6 × ЮВ последовательно</td><td class="mono">258–337 В ✓</td><td class="mono">3,48</td></tr>
+<tr><td rowspan="2">№2 (СЗ, 4,64 кВт)</td><td class="mono">1</td><td>8 × СЗ последовательно</td><td class="mono">344–449 В ✓</td><td class="mono">4,64</td></tr>
+<tr><td class="mono">2</td><td>— свободен (резерв: навес, фасад)</td><td class="mono">—</td><td class="mono">—</td></tr>
+</table></div>
+<p style="margin-bottom:0"><b>Вариант B (14):</b> по 7 ЮВ-панелей на MPPT-1 каждого инвертора (301–393 В ✓). <b>Вариант C (20 на ЮВ):</b> красивее всех — 4 строки по 5 панелей (215–281 В ✓), по одной на каждый MPPT, по 5,8 кВт PV на инвертор, полная симметрия. <b>Вариант G:</b> схема как у A — строка 8 × 35° (449 В) на MPPT-1 инвертора №2 + 2 строки по 6 × 10° на инвертор №1; разные наклоны, как и ориентации, в одну строку не смешивать. </p></div>
+<ul>
+  <li>* V размах = рабочее V<sub>mp</sub> — V<sub>oc</sub> при −25 °C. Все строки внутри окна MPPT и ниже предела 500 В.</li>
+  <li>Ток панели I<sub>mp</sub> ≈ 13,8 А при входе MPPT ~13 А — в редкие пики будет лёгкое ограничение тока (потеря &lt;1–2% за год), это штатно; I<sub>sc</sub> ≈ 14,5 А &lt; допустимых 17 А ✓.</li>
+  <li><b>Дом однофазный → оба Deye в параллель</b> на одну шину 230 В: связь CAN между инверторами (режим Parallel, один Master), суммарно 12 кВт выхода. Уточни у Premier Energy лимит генерации для однофазного ввода по net billing — на 1ф часто ограничивают мощность, возможно придётся зарегистрировать меньше (излишки тогда просто не отдаём, батареи заберут своё).</li>
+  <li><b>Батареи:</b> по одной 15,36 кВт·ч на каждый инвертор (48 В шина, кабель 2×70 мм² не длиннее ~2 м, предохранитель 250 А); адреса на DIP-переключателях, связь BMS↔инвертор по CAN. 30,7 кВт·ч ≈ 1–1,5 суток автономии.</li>
+  <li>Стабилизатор SVEN на фото для этой системы не нужен — гибридный Deye сам держит выходное напряжение на резервных линиях.</li>
+</ul>
+
+<h3>Однолинейная схема (вариант A; для C — 4 строки по 5)</h3>
+<div class="card tablebox"><svg class="sch" viewBox="0 0 1005 600" role="img" aria-label="Однолинейная схема электрики">
+  <!-- PV strings -->
+  <rect class="box" x="15" y="35" width="245" height="56" rx="6"/><text x="30" y="58">Строка 1 · 6 × 580 Вт · ЮВ</text><text class="small" x="30" y="79">V₀c хол. ≈ 337 В · 13,8 А</text>
+  <rect class="box" x="15" y="115" width="245" height="56" rx="6"/><text x="30" y="138">Строка 2 · 6 × 580 Вт · ЮВ</text><text class="small" x="30" y="159">V₀c хол. ≈ 337 В</text>
+  <rect class="box" x="15" y="305" width="245" height="56" rx="6"/><text x="30" y="328">Строка 3 · 8 × 580 Вт · СЗ</text><text class="small" x="30" y="349">V₀c хол. ≈ 449 В</text>
+  <rect class="boxd" x="15" y="385" width="245" height="44" rx="6"/><text class="small" x="30" y="412">MPPT-2 свободен · резерв</text>
+  <!-- DC wires + isolators -->
+  <line class="wdc" x1="260" y1="63" x2="350" y2="63"/><rect class="iso" x="292" y="53" width="22" height="20"/><text class="small" x="340" y="46" text-anchor="end">DC-разъед.</text>
+  <line class="wdc" x1="260" y1="143" x2="350" y2="143"/><rect class="iso" x="292" y="133" width="22" height="20"/>
+  <line class="wdc" x1="260" y1="333" x2="350" y2="333"/><rect class="iso" x="292" y="323" width="22" height="20"/><text class="small" x="340" y="316" text-anchor="end">DC-разъед.</text>
+  <line class="wdc" x1="260" y1="407" x2="330" y2="407" stroke-dasharray="5 5"/><line class="wdc" x1="330" y1="407" x2="350" y2="393" stroke-dasharray="5 5"/>
+  <!-- Inverters -->
+  <rect class="box" x="350" y="30" width="235" height="150" rx="8"/><text x="368" y="58" style="font-weight:600">Deye №1 · SUN-6K-SG05LP1</text>
+  <text class="small" x="368" y="82">MPPT1 ← строка 1</text><text class="small" x="368" y="102">MPPT2 ← строка 2</text><text class="small" x="368" y="128">LOAD → дом (EPS)</text><text class="small" x="368" y="148">GRID → счётчик</text><text class="small" x="368" y="168">BAT ↓ 48 В</text>
+  <rect class="box" x="350" y="300" width="235" height="150" rx="8"/><text x="368" y="328" style="font-weight:600">Deye №2 · SUN-6K-SG05LP1</text>
+  <text class="small" x="368" y="352">MPPT1 ← строка 3</text><text class="small" x="368" y="372">MPPT2 ← резерв</text><text class="small" x="368" y="398">LOAD → дом (EPS)</text><text class="small" x="368" y="418">GRID → счётчик</text><text class="small" x="368" y="438">BAT ↓ 48 В</text>
+  <!-- CAN parallel -->
+  <line class="wcan" x1="467" y1="180" x2="467" y2="300"/><text class="small" x="478" y="245">CAN · параллель (Master №1)</text>
+  <!-- Batteries -->
+  <rect class="box" x="350" y="505" width="235" height="60" rx="8"/><text x="368" y="530">АКБ 2 · LiFePO4 51,2 В · 300 Ач</text><text class="small" x="368" y="551">15,36 кВт·ч · предохр. 250 А</text>
+  <rect class="box" x="60" y="505" width="235" height="60" rx="8"/><text x="78" y="530">АКБ 1 · LiFePO4 51,2 В · 300 Ач</text><text class="small" x="78" y="551">15,36 кВт·ч · 2×70 мм² ≤ 2 м</text>
+  <line class="wbat" x1="177" y1="505" x2="177" y2="480"/><line class="wbat" x1="177" y1="480" x2="360" y2="480"/><line class="wbat" x1="360" y1="480" x2="360" y2="180"/>
+  <line class="wbat" x1="467" y1="505" x2="467" y2="450"/>
+  <!-- AC side -->
+  <rect class="box" x="700" y="30" width="245" height="120" rx="8"/><text x="718" y="58" style="font-weight:600">Щит дома · 230 В · 1ф</text><text class="small" x="718" y="82">все нагрузки на резервируемой</text><text class="small" x="718" y="100">шине (EPS): ТН, тёплый пол,</text><text class="small" x="718" y="118">рециркуляция, розетки, свет</text>
+  <line class="wac" x1="585" y1="120" x2="700" y2="80"/><rect class="iso" x="628" y="88" width="22" height="20"/><text class="small" x="620" y="80">АВ 32 А</text>
+  <line class="wac" x1="585" y1="390" x2="660" y2="390"/><line class="wac" x1="660" y1="390" x2="660" y2="110"/><rect class="iso" x="649" y="200" width="22" height="20"/>
+  <rect class="box" x="700" y="330" width="245" height="66" rx="8"/><text x="718" y="356">Счётчик · net billing</text><text class="small" x="718" y="378">двунаправленный, по заявке</text>
+  <line class="wac" x1="585" y1="140" x2="690" y2="140"/><line class="wac" x1="690" y1="140" x2="690" y2="350"/><line class="wac" x1="690" y1="350" x2="700" y2="350"/>
+  <line class="wac" x1="585" y1="410" x2="700" y2="370"/>
+  <rect class="boxd" x="700" y="425" width="245" height="56" rx="8"/><text x="718" y="450">Сеть Premier Energy · 1ф</text><text class="small" x="718" y="470">вводной АВ · лимит уточнить</text>
+  <line class="wac" x1="822" y1="396" x2="822" y2="425"/>
+  <text class="small" x="700" y="530">Заземление: рама, инверторы, АКБ —</text>
+  <text class="small" x="700" y="550">на контур дома; УЗИП тип 2 (DC и AC).</text>
+</svg></div>
+
+<h2 id="monthly">Помесячный баланс: выработка, потребление, батареи, излишки</h2>
+<p>Модель для варианта A (20 шт, ≈12,4 МВт·ч/год; для C прибавь ~7%). Потребление — оценка для твоего дома: ~330 м², тепловой насос с тёплым полом (≈7,5 МВт·ч эл. за сезон), ГВС на 4 человек, кондиционеры летом, рециркуляция и умный дом в базе ~16 кВт·ч/сутки. Батарея: доступно 27,6 кВт·ч (90% DoD), КПД цикла ~90%. Все цифры — <b>кВт·ч в сутки</b>.</p>
+<div class="card"><div class="tablebox"><table>
+<tr><th>Месяц</th><th class="mono">Выработка</th><th class="mono">Потребление</th><th class="mono">Сразу в дом</th><th class="mono">Через АКБ</th><th class="mono">Излишек → сеть</th><th class="mono">Из сети</th></tr>
+<tr><td>Январь</td><td class="mono">14</td><td class="mono">82</td><td class="mono">14</td><td class="mono">0</td><td class="mono">0</td><td class="mono neg">68</td></tr>
+<tr><td>Февраль</td><td class="mono">22</td><td class="mono">72</td><td class="mono">22</td><td class="mono">0</td><td class="mono">0</td><td class="mono neg">50</td></tr>
+<tr><td>Март</td><td class="mono">32</td><td class="mono">51</td><td class="mono">23</td><td class="mono">8</td><td class="mono">0</td><td class="mono neg">20</td></tr>
+<tr><td>Апрель</td><td class="mono">43</td><td class="mono">31</td><td class="mono">14</td><td class="mono">15</td><td class="mono pos">12</td><td class="mono">2</td></tr>
+<tr><td>Май</td><td class="mono">48</td><td class="mono">24</td><td class="mono">11</td><td class="mono">12</td><td class="mono pos">24</td><td class="mono">1</td></tr>
+<tr><td>Июнь</td><td class="mono">52</td><td class="mono">28</td><td class="mono">13</td><td class="mono">14</td><td class="mono pos">24</td><td class="mono">1</td></tr>
+<tr><td>Июль</td><td class="mono">52</td><td class="mono">32</td><td class="mono">14</td><td class="mono">16</td><td class="mono pos">20</td><td class="mono">2</td></tr>
+<tr><td>Август</td><td class="mono">48</td><td class="mono">32</td><td class="mono">14</td><td class="mono">16</td><td class="mono pos">16</td><td class="mono">2</td></tr>
+<tr><td>Сентябрь</td><td class="mono">39</td><td class="mono">24</td><td class="mono">11</td><td class="mono">12</td><td class="mono pos">15</td><td class="mono">1</td></tr>
+<tr><td>Октябрь</td><td class="mono">26</td><td class="mono">33</td><td class="mono">15</td><td class="mono">10</td><td class="mono">0</td><td class="mono neg">8</td></tr>
+<tr><td>Ноябрь</td><td class="mono">14</td><td class="mono">52</td><td class="mono">14</td><td class="mono">0</td><td class="mono">0</td><td class="mono neg">38</td></tr>
+<tr><td>Декабрь</td><td class="mono">12</td><td class="mono">77</td><td class="mono">12</td><td class="mono">0</td><td class="mono">0</td><td class="mono neg">65</td></tr>
+<tr><th>Год, МВт·ч</th><th class="mono">12,4</th><th class="mono">16,3</th><th class="mono">5,4</th><th class="mono">3,1</th><th class="mono">3,4</th><th class="mono">7,8</th></tr>
+</table></div></div>
+<ul>
+  <li><b>Что это значит:</b> солнце закрывает ~52% годового потребления напрямую и через батареи. Излишки апреля–сентября (~3,4 МВт·ч) через net billing зачитываются против зимнего импорта — по кВт·ч они компенсируют ещё ~40% из «Из сети», итоговый чистый импорт по деньгам ≈ 4,4 МВт·ч, в основном декабрь–февраль.</li>
+  <li><b>Апрель–сентябрь дом фактически автономен:</b> батареи каждый день заполняются к обеду, ночь проходит на них, из сети — крохи в пасмурные серии.</li>
+  <li><b>Зимой (ноябрь–февраль) PV даёт лишь 15–30% дневного потребления</b> — тепловой насос доминирует. Батареи зимой почти не циклируют от солнца; зато на них можно ловить ночной тариф, если он появится.</li>
+  <li><b>Умный дом здесь решает:</b> сдвинь бойлер ГВС, стирку/посудомойку и подогрев пола «про запас» на 11:00–16:00 — самопотребление вырастает с ~52% до 60%+, а излишки и импорт падают одновременно.</li>
+  <li>Батарея 27,6 кВт·ч закрывает вечер–ночь–утро с запасом (ночное потребление ~8–14 кВт·ч) — глубоких разрядов почти не будет, ресурс LiFePO4 при таком режиме 15+ лет.</li>
+</ul>
+
+<h2 id="grid">Сеть: net billing за $1000, запрет выдачи и 3 фазы</h2>
+<div class="grid2">
+  <div class="card">
+    <span class="tag">Контракт net billing · не спешить</span>
+    <p>Излишки по модели — <b>~3,4 МВт·ч/год</b> (апрель–сентябрь). При бытовом тарифе ~2,4 лей/кВт·ч зачёт стоит <b>~$350–450 в год</b> → проект за $1000 окупается за 2,5–3 года. Но это верно, только если зачёт близок к 1:1 и выдачу не порежут.</p>
+    <p>Если сети введут запрет/ограничение выдачи (о чём тебя и предупреждают) — заплаченный проект превращается в бумагу. Риск реальный: сетям 1ф-генерация неудобна, лимиты на фазу маленькие.</p>
+  </div>
+  <div class="card">
+    <span class="tag">План без риска · zero-export</span>
+    <p>Deye умеет <b>Zero Export из коробки</b>: CT-датчик на ввод, «Export Limit = 0» — в сеть не уходит ни ватта, проект подключения генерации не нужен (нужно ли уведомление — уточни у Premier Energy).</p>
+    <p>Потеря против net billing меньше, чем кажется: батареи 30,7 кВт·ч + сдвиг нагрузок умным домом съедают большую часть излишков. Реальная цена отказа от контракта — <b>~$150–250/год</b>. Порядок действий: смонтировать → сезон пожить в zero-export, глядя на фактические излишки в приложении Deye → если за лето «сгорает» больше 2–2,5 МВт·ч и правила зачёта нормальные — тогда нести $1000.</p>
+  </div>
+  <div class="card">
+    <span class="tag">3 фазы · не ради солнца</span>
+    <p><b>Ради СЭС — нет:</b> инверторы у тебя однофазные; на 3ф-вводе они сядут на одну фазу, а выдачу в сеть на фазу сети ограничивают сильнее всего (~4–5 кВт). Выгоды нет, замена на 3ф-гибрид — лишние ~$2000 и продажа своих.</p>
+    <p><b>Ради дома — возможно:</b> зимние пики у тебя 8–12 кВт (ТН + плита + техника). Если вводной 1ф-автомат ≥ 50–63 А (11,5–14,5 кВт) — живётся нормально, оставайся на 1ф. Повод для 3ф: планы на EV-зарядку 11–22 кВт или расширение ТН. Тогда делать 3ф ввод как отдельный проект, а СЭС оставить на «своей» фазе в zero-export.</p>
+  </div>
+</div>
+<p><b>Итого мой порядок:</b> 1) монтаж и запуск в zero-export — бесплатно и без разрешений на генерацию; 2) апрель–сентябрь смотрим фактические излишки; 3) излишки &gt; 2,5 МВт·ч и зачёт честный → платим $1000 за проект; 4) три фазы — отдельное решение под будущие нагрузки (EV), не под эту СЭС.</p>
+
+<h3>А если отдавать в сеть с лимитом — сколько срежется?</h3>
+<p>Правило в Молдове (закон 10/2016 о ВИЭ, механизм facturare netă): мощность станции просьюмера не должна превышать <b>контрактную мощность присоединения</b>, потолок механизма — 200 кВт. Для однофазного бытового ввода контрактная мощность обычно ~7 кВт (32 А) — дальше требуют 3 фазы. Отсюда и цифра «7 кВт на фазу». <b>Подтверди у Premier Energy (022 43 11 11)</b> — на их сайте цифры не опубликованы, а с 12 кВт инверторов на 1ф тебя, скорее всего, попросят либо регистрировать станцию 6–7 кВт, либо переходить на 3ф.</p>
+<ul>
+  <li><b>Deye ограничение отдачи умеет штатно:</b> настройка «Export Limitation» — задаёшь ватты (например 7000 или 6000), контроль через CT-датчик или счётчик на вводе; в параллельном режиме мастер держит суммарный лимит на двоих. Тот же механизм с нулём — это zero-export.</li>
+  <li><b>Срезка при лимите — копеечная, потому что лимит режет только пик ясного летнего дня.</b> Пик станции ~9,5 кВт AC; излишек сверх (лимит + дневная нагрузка ~1–1,5 кВт) возникает лишь на 2–4 часа в ясные месяцы:</li>
+</ul>
+<div class="card"><div class="tablebox"><table>
+<tr><th>Режим отдачи (вариант C/G)</th><th class="mono">Срезается, МВт·ч/год</th><th class="mono">Доходит до дела*</th><th>Комментарий</th></tr>
+<tr><td>Zero-export (запрет)</td><td class="mono">3,4–3,8</td><td class="mono">9,4–10,0</td><td>вся летняя «горка» в мусор</td></tr>
+<tr><td>Лимит 7 кВт</td><td class="mono"><b>~0,2</b></td><td class="mono"><b>~13,1</b></td><td>режется только верхушка пика 2–3 ч в ясный день</td></tr>
+<tr><td>Лимит 6 кВт (станция = один Deye)</td><td class="mono">~0,5</td><td class="mono">~12,8</td><td>реалистичный сценарий для 1ф без переделок</td></tr>
+<tr><td>Лимит 4–5 кВт</td><td class="mono">~1,0</td><td class="mono">~12,3</td><td>всё ещё в 3–4 раза лучше zero-export</td></tr>
+</table></div></div>
+<ul>
+  <li>* потреблено + через АКБ + продано в сеть, МВт·ч/год для варианта C (13,3 генерации). Вывод: <b>даже жёсткий лимит отдачи возвращает 90–95% того, что zero-export выбрасывает</b> — контракт с лимитом сильно осмысленнее полного запрета.</li>
+  <li><b>Трюк против срезки:</b> в Deye настроить зарядку АКБ по времени (TOU) на 11:00–15:00 — батареи съедают именно пиковую верхушку, и до лимита доходит меньше мощности. Плюс сдвиг бойлера/стирки на полдень. С этим даже лимит 4–5 кВт почти не режет.</li>
+  <li>Итог для решения о $1000: если Premier Energy подтвердит net billing с лимитом ≥ 4–5 кВт на твоём вводе — контракт окупается за ~3 года и берёт почти все излишки. Если предложат только полный запрет — оставайся в zero-export и вернись к вопросу через год.</li>
+</ul>
+
+<h3>Полезная энергия при zero-export: варианты пересчитаны с отсечением</h3>
+<p>При запрете выдачи солнце полезно только пока его съедают дом + батарея (батарея переносит энергию внутри суток, но не между сезонами). Всё, что сверх дневного потребления — срезается. Это сильно меняет сравнение вариантов: летний избыток обесценивается, а зимние кВт·ч становятся золотыми.</p>
+<div class="card"><div class="tablebox"><table>
+<tr><th>Вариант</th><th class="mono">Генерация, МВт·ч</th><th class="mono">Полезно (zero-export)</th><th class="mono">Срезается</th><th>Комментарий</th></tr>
+<tr><td>F · 20 шт, 35°, вся крыша</td><td class="mono">14,5</td><td class="mono"><b>10,5</b></td><td class="mono">4,0</td><td>лидер и тут — весь отрыв делает зима</td></tr>
+<tr><td>G2 · два ряда 35° + ряд 10°</td><td class="mono">14,3</td><td class="mono"><b>10,3</b></td><td class="mono">4,0</td><td>максимум из реализуемых, сосед 2,2 м</td></tr>
+<tr><td><b>P · целевой план (G3 + вылет) ★★</b></td><td class="mono">14,0</td><td class="mono"><b>~10,1</b></td><td class="mono">3,9</td><td>та же зима, соседа не нужно вовсе</td></tr>
+<tr><td>G3 · 35° + 35° лёжа + два 10°</td><td class="mono">14,0</td><td class="mono">~10,1</td><td class="mono">3,9</td><td>то же без вылета, сосед 0,7 м</td></tr>
+<tr><td><b>G · 8 × 35° у улицы + 12 × 10° ★</b></td><td class="mono">13,8</td><td class="mono"><b>10,0</b></td><td class="mono">3,8</td><td>рекомендация при запрете выдачи: 95% пользы F без всей крыши</td></tr>
+<tr><td><b>G1 · то же, но без соседа ★</b></td><td class="mono">13,3</td><td class="mono"><b>~9,9</b></td><td class="mono">3,4</td><td>домик внизу вместо захода — вся своя половина</td></tr>
+<tr><td><b>C · 20 шт, ЮВ + сосед</b></td><td class="mono">13,3</td><td class="mono"><b>9,4</b></td><td class="mono">3,9</td><td>к варианту A добавляет лишь +0,4</td></tr>
+<tr><td><b>A · 20 шт, домик</b></td><td class="mono">12,4</td><td class="mono"><b>9,0</b></td><td class="mono">3,4</td><td>базовый</td></tr>
+<tr><td>E · 14 шт, 35° «стоя»</td><td class="mono">10,2</td><td class="mono"><b>9,0</b></td><td class="mono">1,2</td><td>равен A! — зимняя выработка 35° вся полезна</td></tr>
+<tr><td>D / D1 / N / N1 · 20 шт, повороты на юг</td><td class="mono">13,7–14,0</td><td class="mono">9,5–10,1</td><td class="mono">~4</td><td>энергия как у G, но рама и сосед дороже</td></tr>
+<tr><td>B · 14 шт, без переделок</td><td class="mono">9,3</td><td class="mono">8,2</td><td class="mono">1,1</td><td>теряет к A всего 0,8, а не 3,1</td></tr>
+<tr><td>I · 12 шт, 35° «лёжа»</td><td class="mono">8,7</td><td class="mono">8,0</td><td class="mono">0,7</td><td>«минимум работ»: ни переносов, ни соседа</td></tr>
+<tr><td>H / J / K / L / M · 35° + поворот на юг</td><td class="mono">7,5–12,1</td><td class="mono">~7–9</td><td class="mono">~1–3</td><td>двойная потеря площади — закрыто</td></tr>
+</table></div></div>
+<ul>
+  <li><b>Главный вывод:</b> с отсечением разница между вариантами сжимается в разы: A−B по генерации 3,1 МВт·ч, а по полезной энергии — всего 0,8; C даёт к A лишь +0,4. Гнаться за плотностью ради лета смысла мало — <b>ценность имеет зимняя выработка</b>, поэтому крутой наклон резко хорошеет (E из 14 панелей = A из 20).</li>
+  <li><b>Но 20 панелей уже куплены</b> — ставить все 20 всё равно разумно: доп. цена только рама, а если net billing появится, вся генерация снова монетизируется. Просто не жди от «+6 панелей» пропорциональных кВт·ч в zero-export.</li>
+  <li><b>Срезаемые 3–4 МВт·ч можно частично спасти без сети:</b> днём греть бойлер «в максимум», предохлаждать дом кондиционерами к вечеру, стирка/сушка/посудомойка по солнцу, в перспективе — EV. Каждый сдвинутый кВт·ч — минус кВт·ч из срезки.</li>
+  <li><b>Гибрид реализован — вариант G ★ в планировщике:</b> 8 панелей под 35° у улицы (тень уходит на улицу) + 12 под 10°: полезных 10,0 МВт·ч — 95% от F без захвата всей крыши. При zero-export это моя рекомендация вместо C.</li>
+</ul>
+
+<h2 id="membrane">Как сделать мембрану светлой (для bifacial-тыла)</h2>
+<ul>
+  <li><b>Самое дешёвое и рабочее:</b> белая эластомерная кровельная краска по битуму (acrylic elastomeric roof coating / «жидкая резина» белая). 2 слоя, расход 1–1,5 кг/м², наносится валиком по чистой сухой мембране, обновлять раз в 5–8 лет. Альбедо поднимается с ~0,1 (тёмный битум) до 0,6–0,8. Важно: состав должен быть совместим с битумом — обычная фасадная краска отслоится; поверхность промыть и прогрунтовать праймером из той же системы.</li>
+  <li><b>Капитально:</b> светло-серая/белая ПВХ- или ТПО-мембрана поверх существующей — дорого, имеет смысл только если кровле и так нужен ремонт.</li>
+  <li><b>Локально и просто:</b> белая галька или светлый гравий на геотекстиле (или светлая тротуарная плитка) — только под панелями и в межрядьях. Заодно защита мембраны и дорожки для обслуживания.</li>
+  <li><b>Красить нужно не всё:</b> тыльная сторона «видит» в основном полосу под панелью и 1–2 м вокруг — достаточно осветлить зону панельного поля.</li>
+  <li><b>Эффект:</b> при подъёме панелей на 0,5+ м над светлым низом двойное стекло даёт +6–12% выработки; на тёмной мембране без подъёма — лишь +1–3%. Бонус: белая крыша летом холоднее на 20–25 °C → меньше работы кондиционерам и выше КПД самих панелей.</li>
+</ul>
+
+<h2 id="checklist">Проверить на месте до заказа конструкций</h2>
+<ul>
+  <li>Замерить рулеткой от двух краёв крыши <b>реальные позиции всех труб и обоих кондиционеров</b> — на плане они с рукописного эскиза (±30–50 см). Потом подвинуть их на этой схеме и убедиться, что конфликтов 0.</li>
+  <li><b>Высота парапета</b> — от неё считается высота рамы: нижняя кромка панелей вровень с верхом парапета (см. раздел про конструкцию). Заодно проверь, из чего парапет: ж/б пояс — можно анкериться, пустотелый блок — нет.</li>
+  <li><b>Кондиционеры у левого (ЮЗ) парапета:</b> замерь их высоту и позиции. Тень от них падает на северо-восток — зимой после полудня она достаёт до левого столбца панелей (ряды 3–5). Если блоки выше ~0,6 м — либо сдвинуть их к углу, либо смириться с −1–2% годовых на четырёх левых панелях.</li>
+  <li><b>Нагрузка:</b> панели 20 × 32 кг ≈ 640 кг + сварная рама ≈ 300–500 кг (без балласта при анкеровке к парапету) — на плиту идёт ~13–16 кг/м², в парапет — ветровой подъём. Расчёт рамы подтвердить у конструктора.</li>
+  <li>Согласовать смещение 5 стояков (вариант A) с сантехником: фановые трубы переносятся коленом в пределах 0,5–1 м.</li>
+  <li>Трасса кабеля к щиту, заземление конструкций, молниезащита.</li>
+  <li><b>Для варианта C:</b> письменная договорённость с соседом о полосе ~1,1 м + осмотр его половины — где у него трубы и не планирует ли он свои панели.</li>
+  <li><b>Net billing на однофазном вводе:</b> уточнить у Premier Energy допустимую мощность генерации на 1ф и мощность вводного автомата (у тебя будет 12 кВт инверторов).</li>
+</ul>
+
+<h2 id="assumptions">Допущения</h2>
+<ul>
+  <li>Контур крыши: 10,2 × 7,5 м с вырезом 1,6 × 0,6 м в верхнем левом углу. На эскизе глубина выступа подписана 0,90 при боковых сторонах 6,90 и 7,50 — цифры расходятся на 0,3 м, принята согласованная версия (0,6 м). Уточни при замере.</li>
+  <li>Азимут определён по спутниковому снимку: длинная ось дома ≈ 140°/320°. Погрешность ±10° на выводы не влияет.</li>
+  <li>Оценка выработки — по типовым данным инсоляции региона (~1150 кВт·ч/кВт·год при 10° ЮВ, ~950 при 10° СЗ, ~1180 юг 10°, ~1250 ЮВ 35°), без затенения деревьями. Высокие деревья с юга (видны на фото) могут снять ещё 3–8% зимой.</li>
+  <li>Помесячная модель потребления — прикидка по типовым удельным цифрам (утеплённый новый дом ~330 м², ТН COP≈3, местный отопительный сезон). Реальные счета за прошлую зиму сильно уточнят таблицу — пришли, пересчитаю.</li>
+  <li>В зоне захода на соседскую крышу (варианты C, E) её трубы не учтены — осмотреть.</li>
+</ul>
+
+<footer>
+  Размер панели сверен с даташитами 580 Вт TOPCon bifacial dual glass (2278 × 1134 × 30 мм, ~32 кг): Astronergy, Boviet Vega Series. Схема — предварительная, для заказа конструкций нужен замер труб по месту.
+</footer>
+</div>
+
+<script>
+"use strict";
+// ---- geometry (units: cm), origin = top-left roof corner, x → right (10.2 m), y → down (7.5 m)
+const ROOF = {w:1020, h:750};
+const NOTCH = {x:0, y:0, w:160, h:60};           // top-left cutout
+const L = 228, S = 111;                          // landscape footprint at 10° tilt
+const PL = 113, PS = 225;                        // portrait footprint
+const CLR = 5;                                   // clearance around obstacles, cm
+let ARENA = 900;                                 // bottom limit: own roof 750 + accessible neighbor strip (variant-dependent)
+
+const OBST_BASE = [
+ {id:'k1', type:'rect', x:975, y:10, w:28, h:28, label:'вент. выход?', fixed:false},
+ {id:'v1', type:'circ', x:820, y:350, r:15, label:'стояк ⌀30'},
+ {id:'v2', type:'circ', x:230, y:380, r:15, label:'стояк ⌀30 (гусак)'},
+ {id:'p1', type:'circ', x:590, y:650, r:8, label:'канализ.'},
+ {id:'p2', type:'circ', x:540, y:610, r:8, label:'канализ.'},
+ {id:'p3', type:'circ', x:965, y:635, r:8, label:'канализ. выход'},
+ {id:'p4', type:'circ', x:965, y:675, r:8, label:'канализ. выход'},
+ {id:'ac1', type:'rect', x:5, y:470, w:35, h:90, label:'конд.', dashed:true},
+ {id:'ac2', type:'rect', x:5, y:580, w:35, h:90, label:'конд.', dashed:true},
+];
+
+const XS = [55, 289, 523, 757];
+function row(y, face, xs){ return (xs||XS).map(x => ({x, y, w:L, h:S, face})); }
+// rotated rows (variants D/H/J): panels face true south, rows run 40° to the roof edges
+function rotRow(ax, ay, m, tStart, w, h, step){
+  const d = {x:0.766, y:0.643}; // row direction on screen
+  w = w||L; h = h||S; step = step||234;
+  const out = [];
+  for (let i=0;i<m;i++){
+    const t = tStart + i*step;
+    out.push({x:ax + d.x*t - w/2, y:ay + d.y*t - h/2, w, h, face:'SE', rot:40});
+  }
+  return out;
+}
+
+const LAYOUTS = {
+ P: {
+  panels: [].concat(
+    [15,134,253,372,491,610,729,848].map(x => ({x, y:-45, w:PL, h:187, face:'SE'})),
+    [55,289,523,757].map(x => ({x, y:292, w:L, h:93, face:'SE'})),
+    row(445,'SE'),
+    row(604,'SE',[45,279,513,747])
+  ),
+  walks: [{y:142,h:150},{y:385,h:60},{y:556,h:48}],
+  moves: {v1:{x:820,y:415}, v2:{x:230,y:415}, p1:{x:590,y:576}, p2:{x:540,y:576}, p3:{x:992,y:730}, p4:{x:962,y:738}},
+  note: 'Вариант P — целевой план (твоя раскладка, доведённая до нуля конфликтов): 8 «стоя» под 35° с вылетом 45 см на парапет — правый слот свободен, потому что вверху справа не дымоход, а малый вент. выход; ряд «лёжа» под 35°; два ряда по 10° на ЮВ. Все 20 панелей, ≈14,0 МВт·ч/год — И БЕЗ захода на соседа. Переносы: оба стояка ⌀30 на 0,3–0,6 м в проход, два канализационных — в проход ниже, выход канализации — коленом ~0,5 м к углу. Лучший реализуемый вариант.'
+ },
+ A: {
+  panels: [].concat(row(75,'NW'), row(192,'SE'), row(348,'NW'), row(465,'SE'), row(631,'SE')),
+  walks: [{y:303,h:45},{y:576,h:55}],
+  moves: {v1:{x:820,y:325}, v2:{x:230,y:325}, p1:{x:590,y:603}, p3:{x:1000,y:715}, p4:{x:1000,y:740}},
+  energy: '≈12,4',
+  note: 'Вариант A: «домик» восток–запад на своей половине — ряды 1 и 3 наклонены к улице (СЗ), остальные на ЮВ. Серые пунктирные кружки — нынешние позиции 5 стояков, оранжевые стрелки показывают, куда их сместить (в проходы и к углу). Кондиционеры — у левого (ЮЗ) парапета: при подъёме панелей на раме их тень не мешает.'
+ },
+ B: {
+  panels: [].concat(row(75,'SE'), row(245,'SE',[55,289,523]), row(410,'SE'), row(560,'SE',[55,289,613])),
+  walks: [{y:186,h:59},{y:356,h:54},{y:521,h:39}],
+  energy: '≈9,3',
+  note: 'Вариант B: все 14 панелей на юго-восток, трубы не трогаем, к соседу не заходим. Правый слот ряда 2 занят вент. стояком, ряд 4 обходит канализационные трубы. Проверь реальные позиции труб — возможно, влезет 15–16.'
+ },
+ C: {
+  panels: [].concat(row(75,'SE'), row(245,'SE'), row(415,'SE'), row(586,'SE'), row(745,'SE')),
+  walks: [{y:186,h:59},{y:356,h:59},{y:526,h:60},{y:697,h:48}],
+  moves: {v1:{x:820,y:388}, p1:{x:590,y:556}, p2:{x:540,y:556}, p3:{x:1004,y:640}, p4:{x:1004,y:668}},
+  energy: '≈13,3',
+  note: 'Вариант C: все 20 панелей на юго-восток 10°, пятый ряд заходит на крышу соседа на ~1,1 м. Максимальная выработка из всех вариантов (+7% к варианту A). Нужны: согласие соседа, проверка ЕГО труб в этой полосе и смещение 5 стояков (стрелки).'
+ },
+ D: {
+  panels: [].concat(
+    rotRow(702,145,2,0), rotRow(606,260,3,-160), rotRow(510,375,4,-351),
+    rotRow(414,490,5,-351), rotRow(318,605,4,-222), rotRow(222,720,2,-15)
+  ),
+  walks: [],
+  bot: 1050,
+  energy: '≈13,7',
+  note: 'Вариант D: все 20 панелей под 10° строго на юг, ряды по диагонали. Честная цена: чтобы вместить 20, заход на крышу соседа получается не маленьким — до ~3 м в нижнем углу (при полосе 1,5 м влезает лишь 17), и 3–4 стояка оказываются под рядами. Энергия отличная (уровень G), но диагональная рама сложнее в изготовлении, а соседской крыши нужно втрое больше, чем в C/G. Позиции условные, проверка конфликтов для повёрнутых рядов отключена.'
+ },
+ E: {
+  panels: [].concat(
+    [55,174,293,412,531,650,769,888].map(x => ({x, y:75, w:PL, h:187, face:'SE'})),
+    [55,174,293,412,650,769].map(x => ({x, y:645, w:PL, h:187, face:'SE'}))
+  ),
+  walks: [{y:262,h:383}],
+  energy: '≈10,2',
+  note: 'Вариант E: панели «стоя» — портретом под 35° на ЮВ (задняя кромка ~1,3 м). Против зимней тени между рядами нужно 3,8 м, поэтому рядов всего два, влезает 14, и второй ряд всё равно лезет к соседу на 0,8 м. С панели энергии больше, с крыши — меньше, а парусность и анкеровка серьёзнее. Показан для сравнения.'
+ },
+ F: {
+  panels: [].concat(
+    [55,174,293,412,531,650,769,888].map(x => ({x, y:75, w:PL, h:187, face:'SE'})),
+    [55,174,293,412,531,650,769,888].map(x => ({x, y:622, w:PL, h:187, face:'SE'})),
+    [412,531,650,769].map(x => ({x, y:1169, w:PL, h:187, face:'SE'}))
+  ),
+  walks: [{y:262,h:360},{y:809,h:360}],
+  bot: 1500,
+  noObst: true,
+  energy: '≈14,5',
+  note: 'Вариант F — «максимум»: вся крыша дома (10,2 × 15 м) в нашем распоряжении и пустая (трубы условно убраны). Тогда лучший ответ — 20 панелей портретом под 35° на ЮВ в 3 ряда (8+8+4) с межрядьем 3,6 м: ≈14,5 МВт·ч/год, +9% к варианту C и +17% к A. Поворот рядов строго на юг добавил бы ещё ~3%, но усложняет раму — на просторе это уже вкусовщина. Цена варианта: высокая рама (кромка 1,3 м), парусность, занята вся крыша.'
+ },
+ G: {
+  panels: [].concat(
+    [55,174,293,412,531,650,769,888].map(x => ({x, y:75, w:PL, h:187, face:'SE'})),
+    row(405,'SE'), row(586,'SE'), row(745,'SE')
+  ),
+  walks: [{y:262,h:143},{y:516,h:70},{y:697,h:48}],
+  moves: {p1:{x:590,y:556}, p2:{x:540,y:556}, p3:{x:1004,y:640}, p4:{x:1004,y:668}},
+  energy: '≈13,8',
+  note: 'Вариант G «зимний» ★: задний ряд у улицы — 8 панелей «стоя» под 35° (их тень падает на улицу, полю не мешает), перед ними 12 панелей под 10° на ЮВ. 20 панелей, ≈13,8 МВт·ч/год генерации и ≈10,0 полезных при zero-export — почти уровень F, но без всей соседской крыши (заход нижнего ряда ~1,1 м). Переносим только 4 канализационных стояка — вент. стояки ⌀30 остаются на местах.'
+ },
+ H: {
+  panels: [].concat(
+    rotRow(510,375,8,-400,PL,187,119),
+    rotRow(240,700,3,-120,PL,187,119)
+  ),
+  walks: [],
+  energy: '≈8,0',
+  note: 'Вариант H: «стоя» под 35° + поворот рядов строго на юг. Двойной проигрыш площади: и большие межрядья (3,6 м), и пустые углы от поворота — влезает всего ~11 панелей, а нижний ряд ещё и слегка затеняется зимой. Показан, чтобы закрыть вопрос: не стоит. Позиции условные, проверка конфликтов отключена.'
+ },
+ I: {
+  panels: [].concat(
+    [55,289,523,757].map(x => ({x, y:75, w:L, h:93, face:'SE'})),
+    [55,289,523,757].map(x => ({x, y:405, w:L, h:93, face:'SE'})),
+    [55,289,523,757].map(x => ({x, y:693, w:L, h:93, face:'SE'}))
+  ),
+  walks: [{y:168,h:237},{y:498,h:195}],
+  energy: '≈8,7',
+  note: 'Вариант I: «лёжа» (альбомно) под 35° — задняя кромка всего 0,65 м (парусность умеренная), межрядье 1,8 м, трубы обходятся вообще без переносов, заход к соседу всего 0,36 м. Но влезает только 12 панелей: генерация ≈8,7, полезных при zero-export ≈8,0 МВт·ч — как у B, зато работ меньше всех. Это честный «вариант-минимум», если не хочется трогать ни трубы, ни соседа.'
+ },
+ J: {
+  panels: [].concat(
+    rotRow(510,375,4,-351,L,93,234),
+    rotRow(336,583,3,-230,L,93,234),
+    rotRow(684,167,2,0,L,93,234),
+    rotRow(162,790,1,0,L,93,234)
+  ),
+  walks: [],
+  energy: '≈7,5',
+  note: 'Вариант J: «лёжа» под 35° + поворот на юг — худший из всех: пустые углы съедают раскладку до ~10 панелей (7,5 МВт·ч/год). Закрывает вопрос про повороты окончательно: на этой крыше выгоднее держать ряды вдоль парапета. Позиции условные, проверка конфликтов отключена.'
+ },
+ K: {
+  panels: [].concat(
+    rotRow(510,750,9,-476,PL,187,119),
+    rotRow(158,1169,4,-40,PL,187,119),
+    rotRow(862,331,3,-320,PL,187,119)
+  ),
+  walks: [],
+  bot: 1500,
+  noObst: true,
+  energy: '≈12,1',
+  note: 'Вариант K: как F (вся пустая крыша, портрет 35°), но ряды повёрнуты строго на юг. Даже на просторе поворот проигрывает: углы срезают раскладку с 20 до ~16 панелей, и +4% азимута не спасают — 12,1 против 14,5 у F. Правило подтверждается на любой площади: ряды вдоль парапета. Позиции условные, проверка конфликтов отключена.'
+ },
+ L: {
+  panels: [].concat(
+    rotRow(722,497,8,-595,PL,187,119),
+    rotRow(370,916,8,-234,PL,187,119)
+  ),
+  walks: [],
+  bot: 1500,
+  noObst: true,
+  note: 'Вариант L: два ровных ряда по 8 «стоя» под 35° на юг, прижаты к твоей половине настолько, насколько пускает геометрия; зазор между рядами ровно 3,6 м под зимнюю тень. Видно главную беду поворотов: диагональ всё равно уводит нижний ряд глубоко на соседскую половину. 16 панелей. Позиции условные, проверка конфликтов отключена.'
+ },
+ M: {
+  panels: [].concat(
+    rotRow(754,459,7,-526,PL,187,119),
+    rotRow(403,878,7,-217,PL,187,119)
+  ),
+  walks: [],
+  bot: 1500,
+  noObst: true,
+  note: 'Вариант M: два ряда по 7 «стоя» под 35° на юг, прижаты к твоей половине, зазор 3,6 м под зимнюю тень. 14 панелей — на уровне E, но с диагональной рамой и глубоким заходом нижнего ряда. Позиции условные, проверка конфликтов отключена.'
+ },
+ D1: {
+  panels: [].concat(
+    [{x:715, y:75, w:L, h:S, face:'SE'}],
+    rotRow(702,145,1,250),
+    rotRow(606,260,3,-160),
+    rotRow(510,375,4,-351),
+    rotRow(414,490,5,-351),
+    rotRow(318,605,4,-254),
+    rotRow(222,720,2,-15)
+  ),
+  walks: [],
+  bot: 1030,
+  note: 'Вариант D1: D + одна прямая панель в правом верхнем углу (диагональная туда не влезает — мешают дымоход и наклонные габариты). Поле смещается вверх, заход к соседу сокращается с 3,0 до ~2,6 м. Больше одна панель не выигрывает: глубину задаёт весь нижний край поля. Позиции условные, проверка для повёрнутых рядов отключена.'
+ },
+ N1: {
+  panels: [].concat(
+    [55,174,293,412,531,650,769].map(x => ({x, y:65, w:PL, h:187, face:'SE'})),
+    rotRow(702,370,2,20),
+    rotRow(606,485,3,-96),
+    rotRow(510,600,3,-222),
+    rotRow(414,715,3,-331),
+    rotRow(318,830,2,-241)
+  ),
+  walks: [{y:252,h:100}],
+  bot: 950,
+  note: 'Вариант N1: первый ряд — 7 панелей «стоя» под 35° максимально близко к парапету (65 см от края: ближе не пускают вырез крыши слева и дымоход справа), остальные 13 — «лёжа» под 10° с поворотом на юг. ≈14,0 МВт·ч/год — как N. Заход ~1,9 м, 2–3 стояка окажутся под рядами, диагональная рама. Проверка для повёрнутых рядов отключена.'
+ },
+ N2: {
+  panels: [].concat(
+    [55,174,293,412,531,650,769].map(x => ({x, y:-10, w:PL, h:187, face:'SE'})),
+    rotRow(702,370,1,208),
+    rotRow(606,485,3,-170),
+    rotRow(510,600,4,-384),
+    rotRow(414,715,3,-331),
+    rotRow(318,830,2,-241)
+  ),
+  walks: [],
+  bot: 950,
+  moves: {v2:{x:230,y:240}},
+  note: 'Вариант N2 — твоя ручная раскладка, приведённая к честным зазорам: 7 панелей «стоя» под 35° с вылетом 10 см на парапет (левая нависает над вырезом — уточни, что территория под ним твоя), 13 панелей «лёжа» на юг с межрядьем 1,5 м. Панель с дымохода вернулась в диагональное поле. ≈14,0 МВт·ч/год — как у G3, но заход ~2 м, гусак ⌀30 смещается на 1,4 м вверх, а два канализационных стояка остаются под рядами (огибать стойками или переносить). Проверка для повёрнутых рядов отключена — зазоры здесь уже выдержаны, при ручной правке держи ≥1,5 м.'
+ },
+ G1: {
+  panels: [].concat(
+    [55,174,293,412,531,650,769,888].map(x => ({x, y:65, w:PL, h:187, face:'SE'})),
+    row(300,'SE'), row(459,'NW'), row(576,'SE')
+  ),
+  walks: [{y:252,h:48},{y:411,h:48},{y:687,h:60}],
+  moves: {v1:{x:820,y:435}, v2:{x:230,y:435}, p1:{x:590,y:435}, p2:{x:540,y:435}, p3:{x:1004,y:616}, p4:{x:1004,y:644}},
+  note: 'Вариант G1 ★: сжатая версия G — 8 панелей «стоя» под 35° в 65 см от парапета (впритык не пускают вырез слева и дымоход справа), ряд 10° на ЮВ, а нижние два ряда «домиком», чтобы выиграть место. Итог: все 20 панелей ВООБЩЕ БЕЗ захода на соседа, ≈13,3 МВт·ч/год — энергия варианта C строго на своей половине. Цена: все 6 стояков переезжают в один проход (стрелки).'
+ },
+ G2: {
+  panels: [].concat(
+    [55,174,293,412,531,650,769,888].map(x => ({x, y:75, w:PL, h:187, face:'SE'})),
+    [55,174,293,412,531,650,769,888].map(x => ({x, y:622, w:PL, h:187, face:'SE'})),
+    row(859,'SE')
+  ),
+  walks: [{y:262,h:360},{y:809,h:50}],
+  bot: 990,
+  moves: {p1:{x:590,y:450}, p2:{x:540,y:450}, p3:{x:1004,y:838}, p4:{x:1004,y:866}},
+  note: 'Вариант G2: два ряда «стоя» под 35° — у улицы и в середине крыши (между ними 3,6 м против зимней тени, стояки ⌀30 живут в этом зазоре) + ряд 10° на ЮВ внизу. ≈14,3 МВт·ч/год — максимум среди реализуемых, зимой почти как F. Цена: заход ~2,2 м, две высокие рамы (парусность ×2), перенос 4 канализационных стояков.'
+ },
+ G3: {
+  panels: [].concat(
+    [55,174,293,412,531,650,769,888].map(x => ({x, y:65, w:PL, h:187, face:'SE'})),
+    [55,289,523,757].map(x => ({x, y:402, w:L, h:93, face:'SE'})),
+    row(550,'SE'), row(710,'SE')
+  ),
+  walks: [{y:252,h:150},{y:495,h:55},{y:661,h:49}],
+  bot: 850,
+  moves: {p1:{x:590,y:522}, p2:{x:540,y:522}, p3:{x:1004,y:610}, p4:{x:1004,y:638}},
+  note: 'Вариант G3: лесенка наклонов — 8 «стоя» под 35° у улицы, ряд «лёжа» под 35° (задняя кромка всего 0,65 м → зазор к первому ряду 1,5 м вместо 3,6), затем два ряда по 10° на ЮВ. Все 20 панелей, ≈14,0 МВт·ч/год — почти энергия G2, но заход к соседу лишь ~0,7 м и вторая рама низкая (парусность меньше). Вент. стояки ⌀30 остаются, переносим 4 канализационных. Сильный кандидат.'
+ },
+ N: {
+  panels: [].concat(
+    [55,174,293,412,531,650,769,888].map(x => ({x, y:75, w:PL, h:187, face:'SE'})),
+    rotRow(702,370,1,160),
+    rotRow(606,485,3,-96),
+    rotRow(510,600,3,-193),
+    rotRow(414,715,3,-331),
+    rotRow(318,830,2,-241)
+  ),
+  walks: [{y:262,h:120}],
+  bot: 950,
+  energy: '≈14,0',
+  note: 'Вариант N: как G — 8 панелей «стоя» под 35° у улицы — но 12 нижних панелей под 10° повёрнуты строго на юг. Итог ≈14,0 МВт·ч/год: всего +0,2 к G. Цена: диагональная рама всех нижних рядов (каждый своей длины), заход к соседу ~2 м вместо 1,1 м и 2–3 стояка под рядами. Наглядная мораль: поворот на юг при 10° не окупается даже в лучшей конфигурации. Позиции условные, проверка конфликтов для повёрнутых рядов отключена.'
+ }
+};
+
+// ---- state
+let variant = 'A';
+let panels = [];      // {x,y,w,h,face,el}
+let obstacles = [];   // {id,type,x,y,(w,h|r),label,dashed,moved:{x,y}|null, el}
+let selected = null;
+let selection = new Set();
+let measureMode = false;
+
+const svg = document.getElementById('plan');
+const $ = id => document.getElementById(id);
+const NS = 'http://www.w3.org/2000/svg';
+function el(name, attrs, parent){
+  const e = document.createElementNS(NS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function txt(x, y, str, cls, parent, anchor){
+  const t = el('text', {x, y, class:cls||'lbl'}, parent);
+  if (anchor) t.setAttribute('text-anchor', anchor);
+  t.textContent = str;
+  return t;
+}
+
+// ---- static scenery (roof, grid, dims, compass, sun)
+function drawStatic(){
+  const g = $('static');
+  svg.setAttribute('viewBox', `-115 -150 1300 ${ARENA+285}`);
+  // neighbor strip (accessible by agreement — variants C/E use it; F takes the whole half)
+  el('rect',{x:0,y:ROOF.h,width:ROOF.w,height:ARENA-ROOF.h,fill:'var(--walk)',opacity:.25,stroke:'var(--muted)','stroke-width':1.5,'stroke-dasharray':'10 7'}, g);
+  const nbText = ARENA > 1000 ? 'крыша соседа · вся половина в использовании (вариант F)' : 'крыша соседа · ЮГО-ВОСТОК · зона по договорённости';
+  const nb = txt(ROOF.w/2, ROOF.h + (ARENA>1000 ? (ARENA-ROOF.h)/2+60 : 92), nbText, 'lbl', g, 'middle');
+  nb.setAttribute('opacity','.85');
+  const roofPath = `M ${NOTCH.w} 0 H ${ROOF.w} V ${ROOF.h} H 0 V ${NOTCH.h} H ${NOTCH.w} Z`;
+  el('path', {d:roofPath, class:'roofsurf'}, g);
+  // 50 cm grid
+  for (let x=50; x<ROOF.w; x+=50){
+    el('line', {x1:x, y1:(x<NOTCH.w? NOTCH.h:0), x2:x, y2:ROOF.h, class:'gridline'}, g);
+  }
+  for (let y=50; y<ROOF.h; y+=50){
+    el('line', {x1:(y<NOTCH.h? NOTCH.w:0), y1:y, x2:ROOF.w, y2:y, class:'gridline'}, g);
+  }
+  // dimensions
+  const dims = el('g', {class:'dim'}, g);
+  const dline = (x1,y1,x2,y2,label,tx,ty,rot) => {
+    el('line',{x1,y1,x2,y2},dims);
+    el('line',{x1:x1,y1:y1-7,x2:x1,y2:y1+7},dims);
+    el('line',{x1:x2,y1:y2-7,x2:x2,y2:y2+7},dims);
+    const t = txt(tx,ty,label,null,dims,'middle');
+    t.setAttribute('class','');
+    if (rot) t.setAttribute('transform',`rotate(${rot} ${tx} ${ty})`);
+    t.setAttribute('fill','var(--muted)');
+    t.setAttribute('font-family','IBM Plex Mono,monospace');
+    t.setAttribute('font-size','20');
+  };
+  const vline = (x,y1,y2,label) => {
+    el('line',{x1:x,y1,x2:x,y2},dims);
+    el('line',{x1:x-7,y1:y1,x2:x+7,y2:y1},dims);
+    el('line',{x1:x-7,y1:y2,x2:x+7,y2:y2},dims);
+    const t = txt(x-12,(y1+y2)/2,label,null,dims,'middle');
+    t.setAttribute('transform',`rotate(-90 ${x-12} ${(y1+y2)/2})`);
+    t.setAttribute('fill','var(--muted)');
+    t.setAttribute('font-family','IBM Plex Mono,monospace');
+    t.setAttribute('font-size','20');
+  };
+  dline(NOTCH.w,-45,ROOF.w,-45,'8,60',(NOTCH.w+ROOF.w)/2,-56);
+  dline(0,-45,NOTCH.w,-45,'1,60',NOTCH.w/2,-56);
+  vline(-52, NOTCH.h, ROOF.h, '6,90');
+  vline(-20, 0, NOTCH.h, '0,60');
+  vline(1078, 0, ROOF.h, '7,50');
+  vline(1078, ROOF.h, ARENA, '+' + ((ARENA-ROOF.h)/100).toFixed(1).replace('.',','));
+  dline(0,ARENA+58,ROOF.w,ARENA+58,'10,20',ROOF.w/2,ARENA+92);
+  // street label
+  txt(ROOF.w/2, -105, 'УЛИЦА · СЕВЕРО-ЗАПАД', 'lbl-strong', g, 'middle');
+  const lt = txt(-78, 380, 'парапет · ЮЗ', 'lbl', g, 'middle');
+  lt.setAttribute('transform','rotate(-90 -78 380)');
+  // compass (north = 40° clockwise from screen-up)
+  const c = el('g', {class:'compass', transform:'translate(1135 -70)'}, g);
+  el('circle',{cx:0,cy:0,r:46,class:'ring'},c);
+  const rose = el('g',{transform:'rotate(40)'},c);
+  el('path',{d:'M0 -40 L10 0 L0 8 L-10 0 Z', class:'np'},rose);
+  el('path',{d:'M0 40 L10 0 L0 -8 L-10 0 Z', class:'sp', opacity:.45},rose);
+  const nT = txt(0,-52,'С',null,rose,'middle'); nT.setAttribute('fill','var(--ink)'); nT.setAttribute('font-size','20'); nT.setAttribute('font-weight','700');
+  const sT = txt(0,66,'Ю',null,rose,'middle'); sT.setAttribute('fill','var(--muted)'); sT.setAttribute('font-size','18');
+  // sun path hint, bottom-left (south = down-left of plan)
+  const sun = el('g',{transform:`translate(-40 ${ARENA+85})`}, g);
+  el('path',{d:'M 120 34 A 130 130 0 0 1 -18 -78', class:'sunpath'},sun);
+  el('circle',{cx:36,cy:-30,r:16,class:'sun'},sun);
+  for (let a=0;a<8;a++){
+    const rad=a*Math.PI/4;
+    el('line',{x1:36+Math.cos(rad)*22,y1:-30+Math.sin(rad)*22,x2:36+Math.cos(rad)*29,y2:-30+Math.sin(rad)*29,stroke:'var(--accent)','stroke-width':3},sun);
+  }
+  const st = txt(52,8,'юг · полуденное солнце',null,sun,'start');
+  st.setAttribute('fill','var(--accent-ink)'); st.setAttribute('font-size','17'); st.setAttribute('font-weight','600');
+}
+
+// ---- build variant
+function loadVariant(v){
+  variant = v;
+  selected = null;
+  selection = new Set();
+  const lay = LAYOUTS[v];
+  const bot = lay.bot || 900;
+  if (bot !== ARENA){ ARENA = bot; $('static').innerHTML = ''; drawStatic(); }
+  $('measureLayer').innerHTML = '';
+  panels = lay.panels.map(p => ({...p}));
+  obstacles = lay.noObst ? [] : OBST_BASE.map(o => {
+    const mv = lay.moves && lay.moves[o.id];
+    return {...o, moved: mv ? {...mv} : null};
+  });
+  document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v));
+  $('variantNote').textContent = lay.note;
+  if (location.hash !== '#v-'+v) history.replaceState(null, '', '#v-'+v);
+  render();
+}
+
+function render(){
+  const wg = $('walks'), og = $('obstLayer'), pg = $('panelLayer'), tg = $('topLayer');
+  wg.innerHTML = og.innerHTML = pg.innerHTML = tg.innerHTML = '';
+  // walkways
+  LAYOUTS[variant].walks.forEach(w => {
+    el('rect',{x:8,y:w.y,width:ROOF.w-16,height:w.h,class:'walkband'},wg);
+  });
+  // obstacles
+  obstacles.forEach(o => {
+    const g = el('g',{class:'obst'},og);
+    o.el = g;
+    const pos = o.moved || o;
+    if (o.moved){
+      // ghost at original + arrow
+      if (o.type==='circ') el('circle',{cx:o.x,cy:o.y,r:o.r,class:'ghost'},tg);
+      else el('rect',{x:o.x,y:o.y,width:o.w,height:o.h,class:'ghost'},tg);
+      el('line',{x1:o.x,y1:o.y,x2:pos.x,y2:pos.y,class:'movearrow'},tg);
+    }
+    if (o.type==='circ'){
+      el('circle',{cx:pos.x,cy:pos.y,r:o.r,class:'pipe'},g);
+      el('circle',{cx:pos.x,cy:pos.y,r:2.5,fill:'var(--ink)'},g);
+      const t = txt(pos.x+o.r+6, pos.y+5, o.label, null, g);
+      t.setAttribute('class',''); t.setAttribute('fill','var(--muted)');
+      t.setAttribute('font-size','14'); t.setAttribute('font-family','IBM Plex Mono,monospace');
+    } else {
+      el('rect',{x:pos.x,y:pos.y,width:o.w,height:o.h,class:o.dashed?'dashedblock':'block'},g);
+      const t = txt(pos.x+o.w/2, (o.h>o.w ? pos.y-8 : pos.y+o.h+18), o.label, null, g, 'middle');
+      t.setAttribute('class',''); t.setAttribute('fill','var(--muted)');
+      t.setAttribute('font-size','14'); t.setAttribute('font-family','IBM Plex Mono,monospace');
+    }
+    attachDrag(g, o, true);
+  });
+  // panels
+  panels.forEach((p,i) => {
+    const g = el('g',{class:'panel '+(p.face==='SE'?'se':'nw')},pg);
+    p.el = g;
+    drawPanel(g, p, i);
+    attachDrag(g, p, false);
+    if (selection.has(p)) g.classList.add('selected');
+  });
+  checkAll();
+}
+
+function drawPanel(g, p, i){
+  g.innerHTML = '';
+  if (p.rot) g.setAttribute('transform', `rotate(${p.rot} ${p.x+p.w/2} ${p.y+p.h/2})`);
+  else g.removeAttribute('transform');
+  el('rect',{x:p.x,y:p.y,width:p.w,height:p.h,rx:3,class:'body'},g);
+  // cell midline(s)
+  if (p.w >= p.h){
+    el('line',{x1:p.x+p.w/2,y1:p.y+4,x2:p.x+p.w/2,y2:p.y+p.h-4,class:'cell'},g);
+    el('line',{x1:p.x+4,y1:p.y+p.h/2,x2:p.x+p.w-4,y2:p.y+p.h/2,class:'cell'},g);
+  } else {
+    el('line',{x1:p.x+4,y1:p.y+p.h/2,x2:p.x+p.w-4,y2:p.y+p.h/2,class:'cell'},g);
+    el('line',{x1:p.x+p.w/2,y1:p.y+4,x2:p.x+p.w/2,y2:p.y+p.h-4,class:'cell'},g);
+  }
+  // low-edge accent strip: SE → bottom edge, NW → top edge
+  if (p.face==='SE') el('rect',{x:p.x+2,y:p.y+p.h-6,width:p.w-4,height:5,class:'lowedge'},g);
+  else el('rect',{x:p.x+2,y:p.y+1,width:p.w-4,height:5,class:'lowedge'},g);
+  txt(p.x+10, p.y+24, String(i+1), null, g);
+}
+
+// ---- interaction
+function svgPoint(evt){
+  const pt = svg.createSVGPoint();
+  pt.x = evt.clientX; pt.y = evt.clientY;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+const snap = v => Math.round(v/5)*5;
+
+function attachDrag(g, item, isObst){
+  g.addEventListener('pointerdown', ev => {
+    if (measureMode) return;               // рулетка активна — клики измеряют
+    ev.preventDefault();
+    if (!isObst){
+      select(item, ev.shiftKey);
+      if (ev.shiftKey) return;             // shift — только выделение, без перетаскивания
+    }
+    const pos = isObst ? (item.moved || item) : item;
+    const start = svgPoint(ev);
+    const ox = pos.x - start.x, oy = pos.y - start.y;
+    const group = isObst ? null : [...selection].map(p => ({p, x0:p.x, y0:p.y}));
+    const ix = pos.x, iy = pos.y;
+    g.setPointerCapture(ev.pointerId);
+    // lightweight drag: update only dragged elements, full render on release
+    const live = e2 => {
+      const pt = svgPoint(e2);
+      let nx = snap(pt.x + ox), ny = snap(pt.y + oy);
+      if (isObst){
+        const tgt = item.moved || item;
+        tgt.x = nx; tgt.y = ny;
+        repositionObst(g, item);
+      } else {
+        const dx = nx - ix, dy = ny - iy;
+        group.forEach(({p,x0,y0}) => {
+          p.x = Math.max(0, Math.min(ROOF.w - p.w, x0 + dx));
+          p.y = Math.max(-60, Math.min(ARENA - p.h, y0 + dy)); // -60: вылет на парапет
+          if (p.el) drawPanel(p.el, p, panels.indexOf(p));
+        });
+      }
+      checkAll();
+    };
+    const up = e2 => {
+      g.removeEventListener('pointermove', live);
+      g.removeEventListener('pointerup', up);
+      render();
+    };
+    g.addEventListener('pointermove', live);
+    g.addEventListener('pointerup', up);
+  });
+}
+
+function repositionObst(g, o){
+  const pos = o.moved || o;
+  const c = g.querySelectorAll('circle');
+  if (o.type==='circ' && c.length){
+    c[0].setAttribute('cx',pos.x); c[0].setAttribute('cy',pos.y);
+    c[1].setAttribute('cx',pos.x); c[1].setAttribute('cy',pos.y);
+    const t = g.querySelector('text');
+    if (t){ t.setAttribute('x',pos.x+o.r+6); t.setAttribute('y',pos.y+5); }
+  } else {
+    const r = g.querySelector('rect');
+    r.setAttribute('x',pos.x); r.setAttribute('y',pos.y);
+    const t = g.querySelector('text');
+    if (t){ t.setAttribute('x',pos.x+o.w/2); t.setAttribute('y', o.h>o.w ? pos.y-8 : pos.y+o.h+18); }
+  }
+}
+
+function select(p, additive){
+  if (additive){
+    if (selection.has(p)) selection.delete(p); else selection.add(p);
+  } else if (!selection.has(p)){
+    selection = new Set([p]);
+  }
+  selected = selection.has(p) ? p : ([...selection][0] || null);
+  panels.forEach(q => q.el && q.el.classList.toggle('selected', selection.has(q)));
+}
+
+// ---- collision & stats
+function bboxObst(o){
+  const pos = o.moved || o;
+  if (o.type==='circ') return {x:pos.x-o.r-CLR, y:pos.y-o.r-CLR, w:(o.r+CLR)*2, h:(o.r+CLR)*2, o};
+  return {x:pos.x-CLR, y:pos.y-CLR, w:o.w+2*CLR, h:o.h+2*CLR, o};
+}
+const hit = (a,b) => a.x < b.x+b.w && b.x < a.x+a.w && a.y < b.y+b.h && b.y < a.y+a.h;
+
+// annual specific yield, kWh per kWp, by tilt class / facing (regional estimates)
+function yieldOf(p){
+  const steep = p.h===187 || p.h===93 || p.w===187 || p.w===93;   // 35° footprints
+  if (p.rot) return steep ? 1300 : 1180;                          // rotated = true south
+  if (steep) return p.face==='SE' ? 1250 : 750;
+  return p.face==='SE' ? 1150 : 950;
+}
+
+function checkAll(){
+  let conflicts = 0;
+  const obb = obstacles.map(bboxObst);
+  obstacles.forEach(o => o.el && o.el.classList.remove('bad'));
+  panels.forEach(p => {
+    let bad = false;
+    if (!p.rot){ // rotated rows (variant D) are conceptual — AABB checks would false-positive
+      const pb = {x:p.x, y:p.y, w:p.w, h:p.h};
+      // roof bounds: 60 cm overhang over the street parapet is allowed
+      if (p.x < 0 || p.y < -60 || p.x+p.w > ROOF.w || p.y+p.h > ARENA) bad = true;
+      // notch: hovering front row (raised frame) may overhang it; rows on the roof plane may not
+      if (hit(pb, NOTCH) && p.y >= 0) bad = true;
+      // other panels
+      panels.forEach(q => { if (q!==p && !q.rot && hit(pb, q)) bad = true; });
+      // obstacles
+      obb.forEach(b => { if (hit(pb, b)){ bad = true; if (b.o.el) b.o.el.classList.add('bad'); } });
+    }
+    if (bad) conflicts++;
+    if (p.el) p.el.classList.toggle('bad', bad);
+  });
+  $('stN').textContent = panels.length;
+  $('stKw').textContent = (panels.length*0.58).toFixed(2).replace('.',',');
+  const mwh = panels.reduce((s,p) => s + 0.58*yieldOf(p), 0) / 1000;
+  $('stE').textContent = '≈' + mwh.toFixed(1).replace('.',',');
+  const sc = $('stConf');
+  sc.textContent = conflicts;
+  sc.className = conflicts ? 'bad' : 'good';
+}
+
+// ---- toolbar
+document.querySelectorAll('.tab').forEach(b => { b.onclick = () => loadVariant(b.dataset.v); });
+$('btnReset').onclick = () => loadVariant(variant);
+$('btnAdd').onclick = () => {
+  const p = {x:snap((ROOF.w-L)/2), y:snap((ROOF.h-S)/2), w:L, h:S, face:'SE'};
+  panels.push(p); render(); select(p);
+};
+$('btnRot').onclick = rotateSel;
+$('btnDel').onclick = deleteSel;
+function rotateSel(){
+  if (!selection.size) return;
+  selection.forEach(p => {
+    if (p.w > p.h){ p.w = PL; p.h = PS; }
+    else { p.w = L; p.h = S; }
+    p.x = Math.min(p.x, ROOF.w - p.w);
+    p.y = Math.min(p.y, ARENA - p.h);
+  });
+  render();
+}
+function deleteSel(){
+  if (!selection.size) return;
+  panels = panels.filter(p => !selection.has(p));
+  selection = new Set(); selected = null; render();
+}
+document.addEventListener('keydown', ev => {
+  if (['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
+  if (ev.key==='Escape'){ setMeasure(false); return; }
+  if (ev.key==='r' || ev.key==='R' || ev.key==='к' || ev.key==='К'){ rotateSel(); }
+  else if (ev.key==='Delete' || ev.key==='Backspace'){ deleteSel(); ev.preventDefault(); }
+  else if (selection.size && ev.key.startsWith('Arrow')){
+    ev.preventDefault();
+    const dx = ev.key==='ArrowLeft' ? -5 : ev.key==='ArrowRight' ? 5 : 0;
+    const dy = ev.key==='ArrowUp' ? -5 : ev.key==='ArrowDown' ? 5 : 0;
+    selection.forEach(p => {
+      p.x = Math.max(0, Math.min(ROOF.w-p.w, p.x+dx));
+      p.y = Math.max(-60, Math.min(ARENA-p.h, p.y+dy));
+    });
+    render();
+  }
+});
+
+// ---- рулетка
+function setMeasure(on){
+  measureMode = on;
+  $('btnMeasure').classList.toggle('active', on);
+  svg.classList.toggle('measuring', on);
+  if (!on) $('measureLayer').innerHTML = '';
+}
+$('btnMeasure').onclick = () => setMeasure(!measureMode);
+svg.addEventListener('pointerdown', ev => {
+  if (!measureMode) return;
+  ev.preventDefault();
+  const ml = $('measureLayer');
+  ml.innerHTML = '';
+  const p0 = svgPoint(ev);
+  const line = el('line',{x1:p0.x,y1:p0.y,x2:p0.x,y2:p0.y,class:'mline'},ml);
+  el('circle',{cx:p0.x,cy:p0.y,r:5,class:'mdot'},ml);
+  const dot = el('circle',{cx:p0.x,cy:p0.y,r:5,class:'mdot'},ml);
+  const label = txt(p0.x, p0.y-16, '', 'mtext', ml, 'middle');
+  const move = e2 => {
+    const pt = svgPoint(e2);
+    line.setAttribute('x2',pt.x); line.setAttribute('y2',pt.y);
+    dot.setAttribute('cx',pt.x); dot.setAttribute('cy',pt.y);
+    const dx = pt.x-p0.x, dy = pt.y-p0.y;
+    const len = Math.hypot(dx,dy)/100;
+    label.textContent = len.toFixed(2).replace('.',',') + ' м';
+    label.setAttribute('x',(p0.x+pt.x)/2);
+    label.setAttribute('y',(p0.y+pt.y)/2 - 16);
+  };
+  const up = () => {
+    svg.removeEventListener('pointermove', move);
+    svg.removeEventListener('pointerup', up);
+  };
+  svg.addEventListener('pointermove', move);
+  svg.addEventListener('pointerup', up);
+});
+
+drawStatic();
+{
+  const m = location.hash.match(/^#v-([A-Z0-9]+)$/);
+  loadVariant(m && LAYOUTS[m[1]] ? m[1] : 'P');
+}
+window.addEventListener('hashchange', () => {
+  const m = location.hash.match(/^#v-([A-Z0-9]+)$/);
+  if (m && LAYOUTS[m[1]] && m[1] !== variant) loadVariant(m[1]);
+});
+</script>
