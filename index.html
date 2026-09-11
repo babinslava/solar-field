@@ -134,6 +134,16 @@ kbd{font:500 12px "IBM Plex Mono",monospace;background:var(--chip);border:1px so
 .sch .wbat{stroke:var(--ok);stroke-width:2.5;fill:none}
 .sch .wcan{stroke:var(--muted);stroke-width:2;stroke-dasharray:4 5}
 .sch .iso{fill:var(--surface);stroke:var(--ink);stroke-width:1.5}
+/* isometric table drawings */
+.iso{display:block;width:100%;height:auto;min-width:640px}
+.iso .st{stroke:var(--muted);stroke-width:1.5;fill:none}
+.iso .stbar{stroke:var(--ink);stroke-width:4;stroke-linecap:round;fill:none}
+.iso .stbrace{stroke:var(--accent-ink);stroke-width:2;stroke-dasharray:none;fill:none}
+.iso .roofp{fill:var(--roof);stroke:var(--line);stroke-width:1}
+.iso .panelp{fill:var(--panel-se);opacity:.88;stroke:var(--panel-se-line);stroke-width:1.5}
+.iso .parap{fill:var(--walk);opacity:.9;stroke:var(--ink);stroke-width:1.5}
+.iso text{fill:var(--muted);font:500 15px "IBM Plex Mono",monospace}
+.iso .ldr{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
 td.pos{color:var(--ok);font-weight:600}
 td.neg{color:var(--danger);font-weight:600}
 @media (prefers-reduced-motion: no-preference){
@@ -424,6 +434,51 @@ td.neg{color:var(--danger);font-weight:600}
   <li>Расчёт рамы на ветер (у нас ~24 м/с расчётный) стоит показать конструктору — это час работы, а держит она 640 кг стекла на высоте.</li>
 </ul>
 
+
+<h2 id="tables3d">Столы: расчёт конструкции, профили, анкера и балласт</h2>
+<p><b>Статус: предварительный инженерный расчёт</b> (ветер по EN 1991-1-4, упрощённо; запасы заложены). Финальную спецификацию и узлы должен подписать конструктор по местным нормам — особенно для вылетного стола. Сталь: профильная труба С245, горячее цинкование (или грунт + 2 слоя эмали + ежегодный осмотр швов).</p>
+
+<h3>Нагрузки (исходные)</h3>
+<ul>
+  <li><b>Ветер:</b> базовая скорость ~24 м/с, городская застройка, высота ~9 м → пиковое давление q ≈ 0,52 кПа. Аэродинамика открытых наклонных панелей: c<sub>f</sub> = ±1,4 (10°) и ±1,8 (35°, краевая зона). Коэффициент надёжности 1,4.</li>
+  <li><b>Снег:</b> ~0,5 кПа (лёгкий район), на 10° — полностью, на 35° — со сходом.</li>
+  <li><b>Вес:</b> панель 32 кг (0,124 кПа) + сталь.</li>
+</ul>
+
+<div class="card"><div class="tablebox"><table>
+<tr><th>Стол</th><th class="mono">Панелей / м²</th><th class="mono">Расчётный подъём*</th><th class="mono">Точек опоры</th><th>Крепление</th></tr>
+<tr><td>№1 · вылетный 35° (у парапета)</td><td class="mono">8 / 20,6</td><td class="mono">≈27 кН (2,8 т)</td><td class="mono">11 анкеров + 5 стоек</td><td>хим. анкера М12×110 в ж/б парапета, шаг 0,9–1,0 м (запас ×3); задние стойки на кровлю</td></tr>
+<tr><td>№2 · «лёжа» 35°</td><td class="mono">4 / 10,3</td><td class="mono">≈12 кН (1,2 т)</td><td class="mono">10 (5 пар)</td><td>связи к столу №1 и №3 + балласт 2×60 кг на внутр. стойку</td></tr>
+<tr><td>№3, №4 · 10°</td><td class="mono">по 4 / 10,3</td><td class="mono">≈10,5 кН (1,1 т)</td><td class="mono">по 10 (5 пар)</td><td>крайние стойки — анкера в левый/правый парапет через связи поля; внутренние — балласт 2×50–60 кг</td></tr>
+</table></div></div>
+<p>* подъёмная (отрывная) сила на стол при расчётном ветре с коэффициентом 1,4. Все четыре стола связываются продольными балками и раскосами в <b>единое поле</b>: подъём любого стола раздаётся на анкерованный периметр (уличный + левый + правый парапеты).</p>
+
+<h3>Спецификация профилей (с запасом)</h3>
+<div class="card"><div class="tablebox"><table>
+<tr><th>Позиция</th><th class="mono">Сечение</th><th class="mono">Шаг / пролёт</th><th class="mono">Кол-во ≈</th><th>Примечание</th></tr>
+<tr><td>Стойки столов №2–4</td><td class="mono">60×60×3</td><td class="mono">шаг 2,35 м</td><td class="mono">30 шт × 0,8–1,0 м</td><td>пятка 200×200×4 + EPDM 5 мм на кровлю</td></tr>
+<tr><td>Стойки стола №1 (35°)</td><td class="mono">80×80×3</td><td class="mono">шаг 2,35 м</td><td class="mono">5 шт × 1,9 м</td><td>задний ряд; перед опирается на парапет</td></tr>
+<tr><td>Продольные балки</td><td class="mono">60×40×3</td><td class="mono">пролёт 2,35 м</td><td class="mono">~80 м</td><td>σ ≈ 130 МПа &lt; 240 — запас ~1,8</td></tr>
+<tr><td>Наклонные направляющие</td><td class="mono">40×40×3</td><td class="mono">2 на ряд панелей</td><td class="mono">~80 м</td><td>клемп-зоны панелей по паспорту</td></tr>
+<tr><td>Раскосы</td><td class="mono">40×40×2</td><td class="mono">каждая 2-я секция + торцы</td><td class="mono">~40 м</td><td>диагонали в обеих плоскостях</td></tr>
+<tr><td>Анкера в парапеты</td><td class="mono">М12 хим., заделка 110</td><td class="mono">шаг 0,9–1,0 м</td><td class="mono">~24 шт</td><td>сквозь жестяную крышку, герметизация бутил + EPDM</td></tr>
+<tr><td>Балласт</td><td class="mono">плитка 500×500×50</td><td class="mono">2 шт на внутр. стойку</td><td class="mono">~24 шт (700 кг)</td><td>на полках у пяток внутренних стоек</td></tr>
+</table></div></div>
+<p>Итого металла ≈ <b>950–1100 кг</b>; нагрузка на плиту: панели 640 кг + сталь ~1000 + балласт ~700 = <b>~31 кг/м²</b> распределённо — для монолитной плиты норма. Панели крепить только штатными алюминиевыми клеммами (М8 A2) в допустимых зонах длинной стороны.</p>
+
+<h3>Изометрия: типовой стол 10° (№3/№4)</h3>
+<div class="card tablebox"><svg id="iso1" class="iso" viewBox="0 0 980 620" role="img" aria-label="Изометрия стола 10°"></svg></div>
+<h3>Изометрия: вылетный стол 35° с опорой на парапет (№1)</h3>
+<div class="card tablebox"><svg id="iso2" class="iso" viewBox="0 0 980 630" role="img" aria-label="Изометрия вылетного стола 35°"></svg></div>
+
+<h3>Узлы — на что смотреть при сварке и монтаже</h3>
+<ul>
+  <li><b>Опора на парапет:</b> пластина-седло 200×140×5 поверх жестяной крышки через EPDM; анкер М12 сквозь крышку в бетон, отверстие в жести — с бутил-лентой. Капельник (вылет 3 см) не мять — седло опирается на тело парапета, не на кромку.</li>
+  <li><b>Пятка на кровле:</b> 200×200×4 + EPDM 5 мм, без прокола мембраны; у балластных стоек — рамка-полка под 2 плитки.</li>
+  <li><b>Компенсация длины:</b> поле ~9,5 м — овальные отверстия в стыках балок каждые ~4,7 м (термическое расширение стали ~1 мм/м на 90 °C размаха).</li>
+  <li><b>Заземление:</b> перемычки между секциями рамы, спуск на контур дома; панели связаны клеммами с рамой.</li>
+  <li><b>Проверка после первой зимы:</b> протяжка болтов, осмотр анкеров и герметизации.</li>
+</ul>
 <h2 id="electro">Электрика — под твоё оборудование</h2>
 <p>Есть: <b>2 × Deye SUN-6K-SG05LP1-EU</b> (гибрид, 1 фаза, 6 кВт AC, 2 MPPT по ~13 А, PV до 7,8 кВт, MPPT 150–425 В, макс. 500 В, батарейная шина 48 В до 135 А) и <b>2 × LiFePO4 51,2 В 300 Ач</b> = 30,7 кВт·ч. Суммарно 12 кВт AC на 11,6 кВт панелей — сходится отлично.</p>
 <div class="card"><h3>Строки (вариант A — все 20)</h3><div class="tablebox"><table>
@@ -1239,6 +1294,89 @@ svg.addEventListener('pointerdown', ev => {
   svg.addEventListener('pointermove', move);
   svg.addEventListener('pointerup', up);
 });
+
+
+// ---- изометрия столов (все размеры в мм)
+function isoDraw(svgId, cfg){
+  const svgEl = document.getElementById(svgId);
+  if (!svgEl) return;
+  const k = cfg.k, ox = cfg.ox, oy = cfg.oy;
+  const prj = (x,y,z) => [ox + (x - y)*0.866*k, oy + (x + y)*0.5*k - z*k];
+  const mk = (n,a) => { const e = document.createElementNS(NS,n); for (const q in a) e.setAttribute(q,a[q]); svgEl.appendChild(e); return e; };
+  const poly = (pts, cls) => mk('polygon',{points: pts.map(pp => prj(...pp).map(v=>v.toFixed(1)).join(',')).join(' '), class: cls});
+  const seg = (a,b,cls) => { const A=prj(...a), B=prj(...b); mk('line',{x1:A[0],y1:A[1],x2:B[0],y2:B[1],class:cls||'stbar'}); };
+  const lbl = (x,y,z,text,dx,dy,anchor) => {
+    const A = prj(x,y,z);
+    mk('line',{x1:A[0],y1:A[1],x2:A[0]+dx,y2:A[1]+dy,class:'ldr'});
+    const t = mk('text',{x:A[0]+dx+(anchor==='end'?-4:4), y:A[1]+dy+4});
+    if (anchor) t.setAttribute('text-anchor',anchor);
+    t.textContent = text;
+  };
+  return {prj, poly, seg, lbl, mk};
+}
+
+function drawTable10(){
+  const d = isoDraw('iso1', {k:0.075, ox:180, oy:120});
+  if (!d) return;
+  const L=9400, yF=100, yB=1180, zF=800, zB=990;
+  // кровля
+  d.poly([[-600,-500,0],[L+600,-500,0],[L+600,1900,0],[-600,1900,0]],'roofp');
+  const xs=[200,2500,4800,7100,9200];
+  // стойки, пятки, раскосы
+  xs.forEach((x,i) => {
+    d.poly([[x-140,yF-140,0],[x+140,yF-140,0],[x+140,yF+140,0],[x-140,yF+140,0]],'roofp');
+    d.poly([[x-140,yB-140,0],[x+140,yB-140,0],[x+140,yB+140,0],[x-140,yB+140,0]],'roofp');
+    d.seg([x,yF,0],[x,yF,zF]); d.seg([x,yB,0],[x,yB,zB]);
+    d.seg([x,yF,zF],[x,yB,zB]);                       // поперечина
+    if (i<4 && i%2===0){ d.seg([x,yF,0],[xs[i+1],yF,zF],'stbrace'); d.seg([x,yB,0],[xs[i+1],yB,zB],'stbrace'); }
+  });
+  // продольные балки
+  d.seg([100,yF,zF],[L+100,yF,zF]); d.seg([100,yB,zB],[L+100,yB,zB]);
+  // панели 4 шт
+  for (let i=0;i<4;i++){
+    const x0=140+i*2320, x1=x0+2280;
+    d.poly([[x0,60,zF+55],[x1,60,zF+55],[x1,1190,zB+55],[x0,1190,zB+55]],'panelp');
+  }
+  // подписи
+  d.lbl(200,yF,zF/2,'стойка 60×60×3 · перед 0,80 м',14,60);
+  d.lbl(2500,yB,zB,'зад 1,00 м · балка 60×40×3',30,-46);
+  d.lbl(6950,60,zF+55,'4 панели 10° · направляющие 40×40×3',26,96);
+  d.lbl(3650,yF,240,'раскосы 40×40×2',10,66);
+  d.lbl(2500,yF-140,0,'пятка 200×200 + EPDM · балласт 2×50 кг',-20,60,'end');
+  d.lbl(9200,yB,500,'шаг стоек 2,35 м',30,-14,'end');
+}
+
+function drawTable35(){
+  const d = isoDraw('iso2', {k:0.068, ox:210, oy:175});
+  if (!d) return;
+  const L=9400;
+  // кровля и парапет (y: -260..-60), жестяная крышка
+  d.poly([[-600,-60,0],[L+600,-60,0],[L+600,2600,0],[-600,2600,0]],'roofp');
+  d.poly([[-600,-260,770],[L+600,-260,770],[L+600,-60,770],[-600,-60,770]],'parap');   // верх
+  d.poly([[-600,-60,0],[L+600,-60,0],[L+600,-60,770],[-600,-60,770]],'parap');         // внутр. грань
+  d.poly([[L+600,-260,0],[L+600,-60,0],[L+600,-60,770],[L+600,-260,770]],'parap');     // торец
+  const xs=[200,2500,4800,7100,9200];
+  xs.forEach((x,i) => {
+    d.seg([x,-160,770],[x,-160,880]);                  // седло на парапете
+    d.poly([[x-160,1780,0],[x+160,1780,0],[x+160,2060,0],[x-160,2060,0]],'roofp');
+    d.seg([x,1920,0],[x,1920,2140]);                   // задняя стойка 80×80
+    d.seg([x,-160,880],[x,1920,2140]);                 // наклонная направляющая
+    if (i<4 && i%2===0) d.seg([x,1920,0],[xs[i+1],1920,2140],'stbrace');
+  });
+  d.seg([100,-160,880],[L+100,-160,880]);
+  d.seg([100,1920,2140],[L+100,1920,2140]);
+  for (let i=0;i<8;i++){
+    const x0=110+i*1170, x1=x0+1130;
+    d.poly([[x0,-320,830],[x1,-320,830],[x1,1870,2120],[x0,1870,2120]],'panelp');      // вылет за парапет
+  }
+  d.lbl(2500,-160,770,'хим. анкер М12×110 · шаг 1,0 м · сквозь крышку (EPDM+бутил)',26,-64);
+  d.lbl(7100,-320,830,'8 панелей 35° · вылет 0,45 м · кромка 0,83 м',-24,70,'end');
+  d.lbl(9200,1920,1050,'задняя стойка 80×80×3 · h 1,9 м',30,10);
+  d.lbl(4800,1920,2140,'верх 2,1 м · подъём 27 кН — анкеровка ×3 запас',26,-40);
+  d.lbl(200,1920,0,'пятка 200×200 + EPDM',16,44);
+}
+drawTable10();
+drawTable35();
 
 drawStatic();
 {
